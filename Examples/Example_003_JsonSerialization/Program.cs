@@ -13,6 +13,7 @@ var temperatureRange = new TemperatureRange()
     Max = Temperature.WaterEvaporation
 };
 
+// Result json string: { "Min": -5.0, "Max": 100 }
 string temperatureRangeJson = JsonSerializer.Serialize(temperatureRange, options);
 Console.WriteLine($"Temperature range: {temperatureRangeJson}");
 
