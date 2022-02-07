@@ -10,6 +10,8 @@ namespace Sharp.ValueObject
         where TValue : IEquatable<TValue>
         where TValueObject : ValueObject<TValue, TValueObject>
     {
+        private static readonly IReadOnlyCollection<Constant> _declaredConstants;
+
         static ValueObject()
         {
             var definedConstants = typeof(TValueObject)
@@ -19,17 +21,20 @@ namespace Sharp.ValueObject
                 .Cast<Constant>()
                 .ToList();
 
-            DeclaredConstants = new ReadOnlyCollection<Constant>(definedConstants);
+            _declaredConstants = new ReadOnlyCollection<Constant>(definedConstants);
         }
 
-        public static IReadOnlyCollection<Constant> DeclaredConstants { get; }
+        public static IEnumerable<Constant> GetDeclaredConstants() => _declaredConstants;
+
+        public static IEnumerable<TConstant> GetDeclaredConstants<TConstant>()
+            where TConstant : Constant => _declaredConstants.OfType<TConstant>();
 
         public static bool TryGetDeclaredConstant(TValue value, [NotNullWhen(true)] out Constant? constant)
             => TryGetDeclaredConstant(value, EqualityComparer<TValue>.Default, out constant);
 
         public static bool TryGetDeclaredConstant(TValue value, IEqualityComparer<TValue> comparer, [NotNullWhen(true)] out Constant? constant)
         {
-            constant = DeclaredConstants.FirstOrDefault(c => comparer.Equals(c.Value, value));
+            constant = _declaredConstants.FirstOrDefault(c => comparer.Equals(c.Value, value));
             return constant is not null;
         }
 
