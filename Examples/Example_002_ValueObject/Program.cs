@@ -2,9 +2,7 @@
 
 Console.WriteLine("Temperature constants:");
 
-foreach (var declaredConstant in Temperature.DeclaredConstants
-    .OfType<Temperature.Constant>()
-    .OrderBy(c => c.Value))
+foreach (var declaredConstant in Temperature.GetDeclaredConstants<Temperature.Constant>().OrderBy(c => c.Value))
 {
     Console.WriteLine($"\t{declaredConstant.Name,-20}: {declaredConstant.Value:F2} degrees");
 }
@@ -14,7 +12,7 @@ Console.WriteLine();
 
 float temperatureValue = 0.0F;
 
-if (Temperature.TryGetDeclaredConstant(temperatureValue, out var declared) && declared is Temperature.Constant constant)
+if (Temperature.TryGetDeclaredConstant(temperatureValue, out Temperature.Constant? constant))
 {
     Console.WriteLine($@"There is constant temperature ""{constant.Name}"" with value {constant.Value:F2} degrees");
 }
@@ -30,13 +28,13 @@ Temperature temperature = new(temperatureValue);
 
 if (temperature.IsWaterFreeze)
 {
-    Console.WriteLine($"At temperatures {temperature.Value} degrees the water freezes");
+    Console.WriteLine($"At temperatures {temperature} degrees the water freezes");
 }
 else if (temperature.IsWaterEvaporation)
 {
-    Console.WriteLine($"At temperatures {temperature.Value} degrees the water evaporations");
+    Console.WriteLine($"At temperatures {temperature} degrees the water evaporations");
 }
 else
 {
-    Console.WriteLine($"The temperatures {temperature.Value} is normal for water");
+    Console.WriteLine($"The temperatures {temperature} is normal for water");
 }

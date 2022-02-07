@@ -8,13 +8,25 @@ namespace Sharp.ValueObject.Tests
     public class ValueObjectTests
     {
         [Fact]
-        public void DeclaredConstants_ReturnCollectionOfConstants()
+        public void GetDeclaredConstants_ReturnCollectionOfConstants()
         {
             var allConstants = new HashSet<Number.Constant>() {
                 Number.Zero, Number.One, Number.Two, Number.Three
             };
 
-            var declaredConstants = Number.DeclaredConstants.ToHashSet();
+            var declaredConstants = Number.GetDeclaredConstants().ToHashSet();
+
+            Assert.Equal(allConstants, declaredConstants);
+        }
+
+        [Fact]
+        public void GetDeclaredConstantsGeneric_ReturnCollectionOfConstants()
+        {
+            var allConstants = new HashSet<Animal.Constant>() {
+                Animal.Cat, Animal.Dog
+            };
+
+            var declaredConstants = Animal.GetDeclaredConstants<Animal.Constant>().ToHashSet();
 
             Assert.Equal(allConstants, declaredConstants);
         }
@@ -29,6 +41,18 @@ namespace Sharp.ValueObject.Tests
             Assert.True(tryResult);
             Assert.NotNull(constant);
             Assert.Equal(number, constant!.Value);
+        }
+
+        [Fact]
+        public void TryGetDeclaredConstantGeneric_DefinedValue_ReturnTrueAndNotNullConstant()
+        {
+            string animalName = Animal.Cat.ToString();
+
+            bool tryResult = Animal.TryGetDeclaredConstant(animalName, out Animal.Constant? constant);
+
+            Assert.True(tryResult);
+            Assert.NotNull(constant);
+            Assert.Equal(animalName, constant!.Value);
         }
 
         [Fact]

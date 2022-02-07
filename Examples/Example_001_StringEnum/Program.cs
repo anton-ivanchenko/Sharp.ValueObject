@@ -16,4 +16,4 @@ if (direction != Direction.Up)
     direction = Direction.Up;
 }
 
-Console.WriteLine($"Try move to the {direction.Value} direction");
+Console.WriteLine($"Try move to the {direction} direction");
