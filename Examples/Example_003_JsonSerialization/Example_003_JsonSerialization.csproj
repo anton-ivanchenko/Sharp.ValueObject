@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sharp.ValueObject\Sharp.ValueObject.csproj" />
+    <ProjectReference Include="..\..\Sources\Sharp.ValueObject\Sharp.ValueObject.csproj" />
   </ItemGroup>
 
 </Project>
