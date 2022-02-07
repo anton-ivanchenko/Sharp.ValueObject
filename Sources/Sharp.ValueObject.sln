@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example_001_StringEnum", ".
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example_002_ValueObject", "..\Examples\Example_002_ValueObject\Example_002_ValueObject.csproj", "{0119887B-47E6-4CD0-964B-7CA01DD915C7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example_003_JsonSerialization", "Example_003_JsonSerialization\Example_003_JsonSerialization.csproj", "{BF3D6F98-FAF3-4B2D-8439-724E78F71B4F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{0119887B-47E6-4CD0-964B-7CA01DD915C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0119887B-47E6-4CD0-964B-7CA01DD915C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0119887B-47E6-4CD0-964B-7CA01DD915C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF3D6F98-FAF3-4B2D-8439-724E78F71B4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF3D6F98-FAF3-4B2D-8439-724E78F71B4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF3D6F98-FAF3-4B2D-8439-724E78F71B4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF3D6F98-FAF3-4B2D-8439-724E78F71B4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +54,7 @@ Global
 		{E8171850-95F4-47D5-A07D-60AFBEBC096C} = {6C814150-5C6F-4F61-96CC-881E00559578}
 		{37B5E56C-300F-4BE9-B35B-DF865B059444} = {DD1E8FA2-A2D8-4C8C-83AC-6A1892C6E424}
 		{0119887B-47E6-4CD0-964B-7CA01DD915C7} = {DD1E8FA2-A2D8-4C8C-83AC-6A1892C6E424}
+		{BF3D6F98-FAF3-4B2D-8439-724E78F71B4F} = {DD1E8FA2-A2D8-4C8C-83AC-6A1892C6E424}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {810282FE-0F96-4DD1-888B-BF2C89DDE173}
