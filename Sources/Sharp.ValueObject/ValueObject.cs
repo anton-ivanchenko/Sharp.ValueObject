@@ -33,6 +33,22 @@ namespace Sharp.ValueObject
             return constant is not null;
         }
 
+        public static bool TryGetDeclaredConstant<TConstant>(TValue value, [NotNullWhen(true)] out TConstant? constant)
+            where TConstant : Constant => TryGetDeclaredConstant(value, EqualityComparer<TValue>.Default, out constant);
+
+        public static bool TryGetDeclaredConstant<TConstant>(TValue value, IEqualityComparer<TValue> comparer, [NotNullWhen(true)] out TConstant? constant)
+            where TConstant : Constant
+        {
+            if (TryGetDeclaredConstant(value, comparer, out Constant? declaredConstant) && declaredConstant is TConstant typedConstant)
+            {
+                constant = typedConstant;
+                return true;
+            }
+
+            constant = null;
+            return false;
+        }
+
         public static bool TryGetDeclaredValue(TValue value, [NotNullWhen(true)] out TValueObject? valueObject)
             => TryGetDeclaredValue(value, EqualityComparer<TValue>.Default, out valueObject);
 
