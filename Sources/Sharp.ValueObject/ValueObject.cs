@@ -4,8 +4,10 @@ using System.Reflection;
 
 namespace Sharp.ValueObject
 {
-    public abstract partial class ValueObject<TValue, TValueObject>
-        : IEquatable<ValueObject<TValue, TValueObject>>
+    public abstract class ValueObject { }
+
+    public abstract partial class ValueObject<TValue, TValueObject> : ValueObject
+        , IEquatable<ValueObject<TValue, TValueObject>>
         , IEquatable<ValueObject<TValue, TValueObject>.Constant>
         where TValue : IEquatable<TValue>
         where TValueObject : ValueObject<TValue, TValueObject>
@@ -101,6 +103,6 @@ namespace Sharp.ValueObject
 
         public override int GetHashCode() => Value.GetHashCode();
 
-        public override string? ToString() => Value.ToString();
+        public override string ToString() => Value.ToString()!;
     }
 }
