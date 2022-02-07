@@ -79,5 +79,7 @@ namespace Sharp.ValueObject
             => other is not null && Value.Equals(other.Value);
 
         public override int GetHashCode() => Value.GetHashCode();
+
+        public override string? ToString() => Value.ToString();
     }
 }
