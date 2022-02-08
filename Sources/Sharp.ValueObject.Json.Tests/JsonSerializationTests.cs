@@ -1,9 +1,8 @@
-﻿using Sharp.ValueObject.Json;
-using Sharp.ValueObject.Tests.Models;
+﻿using Sharp.ValueObject.Json.Tests.Models;
 using System.Text.Json;
 using Xunit;
 
-namespace Sharp.ValueObject.Tests
+namespace Sharp.ValueObject.Json.Tests
 {
     public class JsonSerializationTests
     {

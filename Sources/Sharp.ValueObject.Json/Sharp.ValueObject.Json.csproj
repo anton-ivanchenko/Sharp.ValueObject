@@ -1,14 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Sources\Sharp.ValueObject.Json\Sharp.ValueObject.Json.csproj" />
+    <ProjectReference Include="..\Sharp.ValueObject\Sharp.ValueObject.csproj" />
   </ItemGroup>
 
 </Project>
