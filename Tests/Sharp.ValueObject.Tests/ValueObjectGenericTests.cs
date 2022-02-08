@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Sharp.ValueObject.Tests
 {
-    public class ValueObjectTests
+    public class ValueObjectGenericTests
     {
         [Fact]
         public void GetDeclaredConstants_ReturnCollectionOfConstants()
