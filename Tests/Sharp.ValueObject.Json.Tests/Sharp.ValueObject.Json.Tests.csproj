@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sharp.ValueObject.Json\Sharp.ValueObject.Json.csproj" />
+    <ProjectReference Include="..\..\Sources\Sharp.ValueObject.Json\Sharp.ValueObject.Json.csproj" />
   </ItemGroup>
 
 </Project>
