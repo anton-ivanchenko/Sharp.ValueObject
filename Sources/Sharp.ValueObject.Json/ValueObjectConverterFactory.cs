@@ -17,9 +17,7 @@ namespace Sharp.ValueObject.Json
         }
 
         public override bool CanConvert(Type typeToConvert)
-        {
-            return typeof(ValueObject).IsAssignableFrom(typeToConvert);
-        }
+            => ValueObject.IsValueObjectType(typeToConvert);
 
         public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
         {
