@@ -54,7 +54,7 @@ namespace Sharp.ValueObject.Json
 
         public override void Write(Utf8JsonWriter writer, TValueObject valueObject, JsonSerializerOptions options)
         {
-            JsonSerializer.Serialize(writer, valueObject.Value);
+            JsonSerializer.Serialize(writer, valueObject.Value, options);
         }
 
         protected virtual TValueObject? ConvertToValueObject(TValue value)
