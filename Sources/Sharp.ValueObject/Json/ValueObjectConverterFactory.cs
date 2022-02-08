@@ -1,5 +1,7 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -26,28 +28,41 @@ namespace Sharp.ValueObject.Json
 
         private static Func<JsonConverter> CreateFactory(Type typeToConvert)
         {
-            for (Type type = typeToConvert; type != typeof(object); type = type.BaseType!)
+            Type genericValueObjectType = ValueObject.GetGenericValueObjectType(typeToConvert);
+            Type innerValueType = ValueObject.GetInnerValueType(genericValueObjectType);
+
+            Type[] genericArguments = genericValueObjectType.GetGenericArguments();
+            Type converterType = typeof(ValueObjectConverter<,>).MakeGenericType(genericArguments);
+
+            ConstructorInfo? converterConstructor = converterType
+                .GetConstructor(new[] { typeof(IEqualityComparer<>).MakeGenericType(innerValueType) });
+
+            Debug.Assert(converterConstructor != null);
+
+            var factoryMethod = Expression.Lambda<Func<JsonConverter>>(
+                Expression.New(converterConstructor, GetEqualityComparer(innerValueType)));
+
+            return factoryMethod.Compile();
+        }
+
+        private static Expression GetEqualityComparer(Type type)
+        {
+            if (type == typeof(string))
             {
-                if (!type.IsGenericType)
-                    continue;
+                PropertyInfo? stringComparerProperty = typeof(StringComparer)
+                    .GetProperty(nameof(StringComparer.OrdinalIgnoreCase), BindingFlags.Public | BindingFlags.Static);
 
-                var typeDefinition = type.GetGenericTypeDefinition();
+                Debug.Assert(stringComparerProperty != null);
 
-                if (typeDefinition == typeof(StringValueObject<>))
-                {
-                    var converterType = typeof(StringValueObjectConverter<>).MakeGenericType(typeToConvert);
-                    var method = Expression.Lambda<Func<JsonConverter>>(Expression.New(converterType));
-                    return method.Compile();
-                }
-                else if (typeDefinition == typeof(ValueObject<,>))
-                {
-                    var converterType = typeof(GenericValueObjectConverter<,>).MakeGenericType(type.GetGenericArguments());
-                    var method = Expression.Lambda<Func<JsonConverter>>(Expression.New(converterType));
-                    return method.Compile();
-                }
+                return Expression.Property(expression: null, stringComparerProperty);
             }
 
-            throw new InvalidOperationException($@"The type ""{typeToConvert}"" cannot be handled");
+            PropertyInfo? equalityComparerProperty = typeof(EqualityComparer<>).MakeGenericType(type)
+                .GetProperty("Default", BindingFlags.Public | BindingFlags.Static);
+
+            Debug.Assert(equalityComparerProperty != null);
+
+            return Expression.Property(expression: null, equalityComparerProperty);
         }
     }
 }

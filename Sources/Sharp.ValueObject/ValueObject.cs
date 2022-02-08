@@ -1,10 +1,36 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Sharp.ValueObject
 {
-    public abstract class ValueObject { }
+    public abstract class ValueObject
+    {
+        public static bool IsValueObjectType(Type type)
+            => typeof(ValueObject).IsAssignableFrom(type);
+
+        public static Type GetInnerValueType(Type type)
+            => GetGenericValueObjectType(type).GetGenericArguments()[0];
+
+        public static Type GetGenericValueObjectType(Type type)
+        {
+            if (!IsValueObjectType(type))
+            {
+                throw new InvalidOperationException($@"The type ""{type}"" is not value object type");
+            }
+
+            Type current = type;
+
+            while (current.BaseType != typeof(ValueObject))
+            {
+                Debug.Assert(current.BaseType != null);
+                current = current.BaseType;
+            }
+
+            return current;
+        }
+    }
 
     public abstract partial class ValueObject<TValue, TValueObject> : ValueObject
         , IEquatable<ValueObject<TValue, TValueObject>>
