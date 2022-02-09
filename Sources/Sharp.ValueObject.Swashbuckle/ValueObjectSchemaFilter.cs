@@ -10,14 +10,9 @@ namespace Sharp.ValueObject.Swashbuckle
             if (!ValueObject.IsValueObjectType(context.Type))
                 return;
 
-            var valueProperties = schema.Properties
-                .Where(c => string.Equals(c.Key, "value", StringComparison.OrdinalIgnoreCase))
-                .Select(c => c.Value)
-                .ToList();
-
-            if (valueProperties.Count == 1)
+            if (schema.Properties.Count == 1)
             {
-                var valueProperty = valueProperties[0];
+                var valueProperty = schema.Properties.Values.First();
 
                 schema.Type = valueProperty.Type;
                 valueProperty.Properties.Clear();
