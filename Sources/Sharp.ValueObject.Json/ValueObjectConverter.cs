@@ -38,11 +38,16 @@ namespace Sharp.ValueObject.Json
         {
             if (reader.TokenType == JsonTokenType.StartObject)
             {
-                // TODO: It is probably not necessary to remove all converters
-                var withoutConverters = new JsonSerializerOptions(options);
-                withoutConverters.Converters.Clear();
+                var objectOptions = new JsonSerializerOptions(options);
+                var converters = objectOptions.Converters;
 
-                return JsonSerializer.Deserialize<TValueObject>(ref reader, withoutConverters);
+                for (int i = converters.Count - 1; i >= 0; i--)
+                {
+                    if (converters[i].CanConvert(typeToConvert))
+                        converters.RemoveAt(i);
+                }
+
+                return JsonSerializer.Deserialize<TValueObject>(ref reader, objectOptions);
             }
 
             TValue? value = JsonSerializer.Deserialize<TValue>(ref reader, options);
