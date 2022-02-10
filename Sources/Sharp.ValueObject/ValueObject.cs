@@ -28,6 +28,9 @@ namespace Sharp.ValueObject
                 current = current.BaseType;
             }
 
+            Debug.Assert(current.IsGenericType);
+            Debug.Assert(current.GetGenericTypeDefinition() == typeof(ValueObject<,>));
+
             return current;
         }
     }
