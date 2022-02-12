@@ -2,7 +2,7 @@
 
 namespace Example_003_JsonSerialization
 {
-    public class Temperature : ValueObject<float, Temperature>
+    public class Temperature : SingleValueObject<float, Temperature>
     {
         public static Constant AbsoluteZero { get; } = new("Absolute zero", -273.15F);
         public static Constant WaterFreeze { get; } = new("Water freeze", 0.0F);
@@ -17,7 +17,7 @@ namespace Example_003_JsonSerialization
         public bool IsWaterFreeze => Value <= WaterFreeze.Value;
         public bool IsWaterEvaporation => Value >= WaterEvaporation.Value;
 
-        public new class Constant : ValueObject<float, Temperature>.Constant
+        public new class Constant : SingleValueObject<float, Temperature>.Constant
         {
             public Constant(string name, float value) : base(value)
             {

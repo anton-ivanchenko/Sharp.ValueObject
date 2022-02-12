@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sharp.ValueObject.SingleValueObjects;
+using System;
 
 namespace Sharp.ValueObject.Tests.Models
 {

@@ -6,7 +6,7 @@ namespace Sharp.ValueObject.Json
 {
     public class ValueObjectConverter<TValue, TValueObject> : JsonConverter<TValueObject>
         where TValue : IEquatable<TValue>
-        where TValueObject : ValueObject<TValue, TValueObject>
+        where TValueObject : SingleValueObject<TValue, TValueObject>
     {
         private readonly static Func<TValue, TValueObject>? _factory;
 
@@ -64,7 +64,7 @@ namespace Sharp.ValueObject.Json
 
         protected virtual TValueObject? ConvertToValueObject(TValue value)
         {
-            if (ValueObject<TValue, TValueObject>.TryGetDeclaredValue(value, EqualityComparer, out TValueObject? valueObject))
+            if (SingleValueObject<TValue, TValueObject>.TryGetDeclaredValue(value, EqualityComparer, out TValueObject? valueObject))
             {
                 return valueObject;
             }

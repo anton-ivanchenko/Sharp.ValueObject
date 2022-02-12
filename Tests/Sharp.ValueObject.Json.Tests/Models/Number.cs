@@ -1,6 +1,6 @@
 ﻿namespace Sharp.ValueObject.Json.Tests.Models
 {
-    public sealed class Number : ValueObject<int, Number>
+    public sealed class Number : SingleValueObject<int, Number>
     {
         public static Constant Zero { get; } = new(0);
         public static Constant One { get; } = new(1);

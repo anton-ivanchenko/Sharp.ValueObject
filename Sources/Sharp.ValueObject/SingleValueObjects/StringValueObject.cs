@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Sharp.ValueObject
+namespace Sharp.ValueObject.SingleValueObjects
 {
-    public abstract class StringValueObject<TValueObject> : ValueObject<string, TValueObject>
-        where TValueObject : ValueObject<string, TValueObject>
+    public abstract class StringValueObject<TValueObject> : SingleValueObject<string, TValueObject>
+        where TValueObject : SingleValueObject<string, TValueObject>
     {
         public static bool TryParse(string value, [NotNullWhen(true)] out TValueObject? instance)
             => TryGetDeclaredValue(value, out instance);

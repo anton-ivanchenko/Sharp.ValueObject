@@ -33,13 +33,13 @@ namespace Sharp.ValueObject.Tests
         [Fact]
         public void GetGenericValueObjectType_StringValueObject_ReturnGenericValueObjectType()
         {
-            Assert.Equal(typeof(ValueObject<string, Color>), ValueObject.GetGenericValueObjectType(typeof(Color)));
+            Assert.Equal(typeof(SingleValueObject<string, Color>), ValueObject.GetGenericValueObjectType(typeof(Color)));
         }
 
         [Fact]
         public void GetGenericValueObjectType_IntegerValueObject_ReturnGenericValueObjectType()
         {
-            Assert.Equal(typeof(ValueObject<int, Number>), ValueObject.GetGenericValueObjectType(typeof(Number)));
+            Assert.Equal(typeof(SingleValueObject<int, Number>), ValueObject.GetGenericValueObjectType(typeof(Number)));
         }
 
         [Fact]
