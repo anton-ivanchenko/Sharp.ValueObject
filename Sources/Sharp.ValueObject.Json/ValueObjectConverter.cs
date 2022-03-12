@@ -36,20 +36,6 @@ namespace Sharp.ValueObject.Json
 
         public override TValueObject? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            if (reader.TokenType == JsonTokenType.StartObject)
-            {
-                var objectOptions = new JsonSerializerOptions(options);
-                var converters = objectOptions.Converters;
-
-                for (int i = converters.Count - 1; i >= 0; i--)
-                {
-                    if (converters[i].CanConvert(typeToConvert))
-                        converters.RemoveAt(i);
-                }
-
-                return JsonSerializer.Deserialize<TValueObject>(ref reader, objectOptions);
-            }
-
             TValue? value = JsonSerializer.Deserialize<TValue>(ref reader, options);
 
             return value != null
