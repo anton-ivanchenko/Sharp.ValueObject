@@ -143,16 +143,16 @@ namespace Sharp.ValueObject
             public static bool operator !=(Constant? left, Constant? right)
                 => !(left == right);
 
-            public static bool operator ==(Constant? left, TValueObject? right)
+            public static bool operator ==(Constant? left, SingleValueObject<TValue, TValueObject>? right)
                 => left is null ? right is null : left.Equals(right);
 
-            public static bool operator !=(Constant? left, TValueObject? right)
+            public static bool operator !=(Constant? left, SingleValueObject<TValue, TValueObject>? right)
                 => !(left == right);
 
-            public static bool operator ==(TValueObject? left, Constant? right)
+            public static bool operator ==(SingleValueObject<TValue, TValueObject>? left, Constant? right)
                 => (right == left);
 
-            public static bool operator !=(TValueObject? left, Constant? right)
+            public static bool operator !=(SingleValueObject<TValue, TValueObject>? left, Constant? right)
                 => (right != left);
 
             public Constant(TValue value)
