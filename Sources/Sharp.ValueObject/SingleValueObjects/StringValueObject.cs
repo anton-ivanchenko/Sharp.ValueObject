@@ -11,6 +11,12 @@ namespace Sharp.ValueObject.SingleValueObjects
         public static bool TryParseCaseInsensitive(string value, [NotNullWhen(true)] out TValueObject? instance)
             => TryGetDeclaredValue(value, StringComparer.OrdinalIgnoreCase, out instance);
 
+        public static bool TryGetDeclaredConstantCaseInsensitive(string value, [NotNullWhen(true)] out Constant? constant)
+            => TryGetDeclaredConstant(value, StringComparer.OrdinalIgnoreCase, out constant);
+
+        public static bool TryGetDeclaredConstantCaseInsensitive<TConstant>(string value, [NotNullWhen(true)] out TConstant? constant)
+            where TConstant : Constant => TryGetDeclaredConstant(value, StringComparer.OrdinalIgnoreCase, out constant);
+
         protected StringValueObject(string value) : base(value) { }
     }
 }
