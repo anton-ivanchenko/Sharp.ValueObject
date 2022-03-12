@@ -22,10 +22,10 @@ namespace Sharp.ValueObject.SingleValueObjects
         public bool EqualsCaseInsensitive(object? other)
         {
             if (other is StringValueObject<TValueObject> valueObject)
-                return Equals(valueObject);
+                return EqualsCaseInsensitive(valueObject);
 
             if (other is Constant constant)
-                return Equals(constant);
+                return EqualsCaseInsensitive(constant);
 
             return false;
         }
