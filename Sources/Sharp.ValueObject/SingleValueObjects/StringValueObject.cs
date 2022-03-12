@@ -18,5 +18,22 @@ namespace Sharp.ValueObject.SingleValueObjects
             where TConstant : Constant => TryGetDeclaredConstant(value, StringComparer.OrdinalIgnoreCase, out constant);
 
         protected StringValueObject(string value) : base(value) { }
+
+        public bool EqualsCaseInsensitive(object? other)
+        {
+            if (other is StringValueObject<TValueObject> valueObject)
+                return Equals(valueObject);
+
+            if (other is Constant constant)
+                return Equals(constant);
+
+            return false;
+        }
+
+        public bool EqualsCaseInsensitive(StringValueObject<TValueObject>? other)
+            => other is not null && Value.Equals(other.Value, StringComparison.OrdinalIgnoreCase);
+
+        public bool EqualsCaseInsensitive(Constant? other)
+            => other is not null && Value.Equals(other.Value, StringComparison.OrdinalIgnoreCase);
     }
 }
