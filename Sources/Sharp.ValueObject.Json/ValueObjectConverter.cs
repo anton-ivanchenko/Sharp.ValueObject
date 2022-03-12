@@ -8,7 +8,7 @@ namespace Sharp.ValueObject.Json
         where TValue : IEquatable<TValue>
         where TValueObject : SingleValueObject<TValue, TValueObject>
     {
-        private readonly static Func<TValue, TValueObject>? _factory;
+        private static readonly Func<TValue, TValueObject>? _factory;
 
         static ValueObjectConverter()
         {
@@ -48,7 +48,7 @@ namespace Sharp.ValueObject.Json
             JsonSerializer.Serialize(writer, valueObject.Value, options);
         }
 
-        protected virtual TValueObject? ConvertToValueObject(TValue value)
+        protected virtual TValueObject ConvertToValueObject(TValue value)
         {
             if (SingleValueObject<TValue, TValueObject>.TryGetDeclaredValue(value, EqualityComparer, out TValueObject? valueObject))
             {

@@ -41,7 +41,7 @@ namespace Sharp.ValueObject.Json
                 return CreateEnumerableValueObjectFactory(typeToConvert, valueType);
             }
 
-            throw new InvalidOperationException();
+            throw new InvalidOperationException(@$"This type of converter cannot be used to handle ""{typeToConvert}"" type");
         }
 
         private static Func<JsonConverter> CreateValueObjectFactory(Type typeToConvert)
