@@ -34,7 +34,7 @@ namespace Sharp.ValueObject.SingleValueObjects
         }
 
         public bool EqualsCaseInsensitive(string? other)
-            => other is not null && Value.Equals(other);
+            => other is not null && Value.Equals(other, StringComparison.OrdinalIgnoreCase);
 
         public bool EqualsCaseInsensitive(StringValueObject<TValueObject>? other)
             => other is not null && Value.Equals(other.Value, StringComparison.OrdinalIgnoreCase);
