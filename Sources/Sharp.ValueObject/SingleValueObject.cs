@@ -85,6 +85,9 @@ namespace Sharp.ValueObject
 
         public override bool Equals(object? other)
         {
+            if (other is TValue value)
+                return Equals(value);
+
             if (other is SingleValueObject<TValue, TValueObject> valueObject)
                 return Equals(valueObject);
 
@@ -93,6 +96,9 @@ namespace Sharp.ValueObject
 
             return false;
         }
+
+        public bool Equals(TValue? other)
+            => other is not null && Value.Equals(other);
 
         public bool Equals(SingleValueObject<TValue, TValueObject>? other)
             => other is not null && Value.Equals(other.Value);

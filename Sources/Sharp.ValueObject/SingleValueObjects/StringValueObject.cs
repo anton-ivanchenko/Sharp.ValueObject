@@ -21,6 +21,9 @@ namespace Sharp.ValueObject.SingleValueObjects
 
         public bool EqualsCaseInsensitive(object? other)
         {
+            if (other is string value)
+                return EqualsCaseInsensitive(value);
+
             if (other is StringValueObject<TValueObject> valueObject)
                 return EqualsCaseInsensitive(valueObject);
 
@@ -29,6 +32,9 @@ namespace Sharp.ValueObject.SingleValueObjects
 
             return false;
         }
+
+        public bool EqualsCaseInsensitive(string? other)
+            => other is not null && Value.Equals(other);
 
         public bool EqualsCaseInsensitive(StringValueObject<TValueObject>? other)
             => other is not null && Value.Equals(other.Value, StringComparison.OrdinalIgnoreCase);
