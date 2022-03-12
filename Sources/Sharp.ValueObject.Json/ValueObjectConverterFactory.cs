@@ -1,5 +1,7 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json;
@@ -17,14 +19,32 @@ namespace Sharp.ValueObject.Json
         }
 
         public override bool CanConvert(Type typeToConvert)
-            => ValueObject.IsValueObjectType(typeToConvert);
+            => ValueObject.IsValueObjectType(typeToConvert) || TryGetEnumerableGenericParameter(typeToConvert, out _);
 
-        public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
+        public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
         {
-            return _cachedFactories.GetOrAdd(typeToConvert, t => CreateFactory(t)).Invoke();
+            var factoryMethod = _cachedFactories.GetOrAdd(typeToConvert, t => CreateFactory(t));
+            var jsonConverter = factoryMethod.Invoke();
+
+            return jsonConverter;
         }
 
         private static Func<JsonConverter> CreateFactory(Type typeToConvert)
+        {
+            if (ValueObject.IsValueObjectType(typeToConvert))
+            {
+                return CreateValueObjectFactory(typeToConvert);
+            }
+
+            if (TryGetEnumerableGenericParameter(typeToConvert, out Type? valueType))
+            {
+                return CreateEnumerableValueObjectFactory(typeToConvert, valueType);
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        private static Func<JsonConverter> CreateValueObjectFactory(Type typeToConvert)
         {
             Type genericValueObjectType = ValueObject.GetGenericValueObjectType(typeToConvert);
             Type innerValueType = ValueObject.GetInnerValueType(genericValueObjectType);
@@ -43,20 +63,48 @@ namespace Sharp.ValueObject.Json
             return factoryMethod.Compile();
         }
 
-        private static Expression GetEqualityComparer(Type type)
+        private static Func<JsonConverter> CreateEnumerableValueObjectFactory(Type typeToConvert, Type valueType)
         {
-            if (type == typeof(string))
+            Type genericValueObjectType = ValueObject.GetGenericValueObjectType(valueType);
+            Type[] genericArguments = genericValueObjectType.GetGenericArguments();
+
+            Array.Resize(ref genericArguments, 3);
+            genericArguments[2] = typeToConvert;
+
+            Type converterType = typeof(EnumerableValueObjectConverter<,,>).MakeGenericType(genericArguments);
+            ConstructorInfo? converterConstructor = converterType.GetConstructor(Array.Empty<Type>());
+
+            Debug.Assert(converterConstructor != null);
+
+            var factoryMethod = Expression.Lambda<Func<JsonConverter>>(Expression.New(converterConstructor));
+
+            return factoryMethod.Compile();
+        }
+
+        private static bool TryGetEnumerableGenericParameter(Type typeToConvert, [NotNullWhen(true)] out Type? valueObjectType)
+        {
+            if (!typeof(IEnumerable).IsAssignableFrom(typeToConvert))
             {
-                PropertyInfo? stringComparerProperty = typeof(StringComparer)
-                    .GetProperty(nameof(StringComparer.OrdinalIgnoreCase), BindingFlags.Public | BindingFlags.Static);
-
-                Debug.Assert(stringComparerProperty != null);
-
-                return Expression.Property(expression: null, stringComparerProperty);
+                valueObjectType = null;
+                return false;
             }
 
-            PropertyInfo? equalityComparerProperty = typeof(EqualityComparer<>).MakeGenericType(type)
-                .GetProperty("Default", BindingFlags.Public | BindingFlags.Static);
+            valueObjectType = typeToConvert.GetInterfaces()
+                .Where(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                .Select(type => type.GetGenericArguments()[0])
+                .FirstOrDefault(type => ValueObject.IsValueObjectType(type));
+
+            return valueObjectType != null;
+        }
+
+        private static Expression GetEqualityComparer(Type type)
+        {
+            BindingFlags propertyBindingMask = BindingFlags.Public | BindingFlags.Static;
+
+            // TODO: For strings, case-insensitive comparisons are always used
+            PropertyInfo? equalityComparerProperty = (type == typeof(string))
+                ? typeof(StringComparer).GetProperty(nameof(StringComparer.OrdinalIgnoreCase), propertyBindingMask)
+                : typeof(EqualityComparer<>).MakeGenericType(type).GetProperty("Default", propertyBindingMask);
 
             Debug.Assert(equalityComparerProperty != null);
 
