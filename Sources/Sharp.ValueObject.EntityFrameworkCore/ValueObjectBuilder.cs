@@ -30,6 +30,7 @@ namespace Sharp.ValueObject.EntityFrameworkCore
 
         public ValueObjectBuilder<TEntity, TValueObject> IsRequired(bool required = true)
         {
+            ValueProperty(v => v.IsRequired(required));
             _entityTypeBuilder.Navigation(_valueObjectProperty).IsRequired(required);
             return this;
         }
