@@ -8,6 +8,7 @@ namespace Sharp.ValueObject
     public abstract partial class SingleValueObject<TValue, TValueObject> : ValueObject
         , IEquatable<SingleValueObject<TValue, TValueObject>>
         , IEquatable<SingleValueObject<TValue, TValueObject>.Constant>
+        , ICloneable
         where TValue : IEquatable<TValue>
         where TValueObject : SingleValueObject<TValue, TValueObject>
     {
@@ -109,6 +110,10 @@ namespace Sharp.ValueObject
         public override int GetHashCode() => Value.GetHashCode();
 
         public override string ToString() => Value.ToString()!;
+
+        public TValueObject Clone() => (TValueObject)((ICloneable)this).Clone();
+
+        object ICloneable.Clone() => MemberwiseClone();
 
         public class Constant : IEquatable<SingleValueObject<TValue, TValueObject>>, IEquatable<Constant>
         {
