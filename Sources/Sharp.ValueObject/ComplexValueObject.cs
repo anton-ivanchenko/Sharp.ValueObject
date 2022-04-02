@@ -39,7 +39,9 @@ namespace Sharp.ValueObject
         {
             ParameterExpression left = Expression.Parameter(typeof(TValueObject), nameof(left));
             ParameterExpression right = Expression.Parameter(typeof(TValueObject), nameof(right));
-            Expression equalityOperators = Expression.Constant(true, typeof(bool));
+
+            List<Expression> body = new();
+            LabelTarget exitLabel = Expression.Label(typeof(bool));
 
             foreach (var property in properties)
             {
@@ -49,13 +51,33 @@ namespace Sharp.ValueObject
 
                 Debug.Assert(propertyEquatableMethod is not null);
 
-                equalityOperators = Expression.AndAlso(equalityOperators, Expression.Call(
-                    Expression.MakeMemberAccess(left, property),
-                    propertyEquatableMethod,
-                    Expression.MakeMemberAccess(right, property)));
+                Expression? equalityExpression = null;
+
+                if (property.PropertyType.IsClass)
+                {
+                    equalityExpression = Expression.IfThenElse(
+                        Expression.Equal(Expression.MakeMemberAccess(left, property), Expression.Constant(null, property.PropertyType)),
+                        Expression.IfThen(
+                            Expression.NotEqual(Expression.MakeMemberAccess(right, property), Expression.Constant(null, property.PropertyType)),
+                            Expression.Return(exitLabel, Expression.Constant(false))),
+                        Expression.IfThen(Expression.Not(
+                                Expression.Call(Expression.MakeMemberAccess(left, property), propertyEquatableMethod, Expression.MakeMemberAccess(right, property))),
+                                Expression.Return(exitLabel, Expression.Constant(false))));
+                }
+                else
+                {
+                    equalityExpression = Expression.IfThen(Expression.Not(
+                        Expression.Call(Expression.MakeMemberAccess(left, property), propertyEquatableMethod, Expression.MakeMemberAccess(right, property))),
+                        Expression.Return(exitLabel, Expression.Constant(false)));
+                }
+
+
+                body.Add(equalityExpression);
             }
 
-            var lambdaMethod = Expression.Lambda<Func<TValueObject?, TValueObject?, bool>>(equalityOperators, left, right);
+            body.Add(Expression.Label(exitLabel, Expression.Constant(true)));
+
+            var lambdaMethod = Expression.Lambda<Func<TValueObject?, TValueObject?, bool>>(Expression.Block(body), left, right);
 
             return lambdaMethod.Compile();
         }
