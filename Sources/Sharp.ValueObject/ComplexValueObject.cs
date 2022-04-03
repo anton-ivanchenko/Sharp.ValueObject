@@ -1,10 +1,12 @@
-﻿using System.Diagnostics;
+﻿using Sharp.ValueObject.Internal;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Sharp.ValueObject
 {
     public class ComplexValueObject<TValueObject> : ValueObject
+        , IComplexValueObjectTrait
         , IEquatable<ComplexValueObject<TValueObject>>
         where TValueObject : ComplexValueObject<TValueObject>
     {

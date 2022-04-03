@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using Sharp.ValueObject.Internal;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -8,6 +9,7 @@ namespace Sharp.ValueObject
     public abstract partial class SingleValueObject<TValue, TValueObject> : ValueObject
         , IEquatable<SingleValueObject<TValue, TValueObject>>
         , IEquatable<SingleValueObject<TValue, TValueObject>.Constant>
+        , ISingleValueObjectTrait
         , ICloneable
         where TValue : IEquatable<TValue>
         where TValueObject : SingleValueObject<TValue, TValueObject>
@@ -114,6 +116,11 @@ namespace Sharp.ValueObject
         public TValueObject Clone() => (TValueObject)((ICloneable)this).Clone();
 
         object ICloneable.Clone() => MemberwiseClone();
+
+        public string Test()
+        {
+            throw new NotImplementedException();
+        }
 
         public class Constant : IEquatable<SingleValueObject<TValue, TValueObject>>, IEquatable<Constant>
         {

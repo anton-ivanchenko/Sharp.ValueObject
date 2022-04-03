@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Sharp.ValueObject.Internal;
+using System.Diagnostics;
 
 namespace Sharp.ValueObject
 {
@@ -7,16 +8,34 @@ namespace Sharp.ValueObject
         public static bool IsValueObjectType(Type type)
             => typeof(ValueObject).IsAssignableFrom(type);
 
-        public static Type GetInnerValueType(Type type)
-            => GetGenericValueObjectType(type).GetGenericArguments()[0];
+        public static bool IsSingleValueObjectType(Type type)
+            => typeof(ISingleValueObjectTrait).IsAssignableFrom(type);
+
+        public static bool IsComplexValueObjectType(Type type)
+            => typeof(IComplexValueObjectTrait).IsAssignableFrom(type);
+
+        public static Type GetSingleValueObjectInnerValueType(Type type)
+        {
+            if (!IsSingleValueObjectType(type))
+            {
+                throw new InvalidOperationException($@"The type ""{type}"" is not a single value object type");
+            }
+
+            return UnsafeGetGenericValueObjectType(type).GetGenericArguments()[0];
+        }
 
         public static Type GetGenericValueObjectType(Type type)
         {
             if (!IsValueObjectType(type))
             {
-                throw new InvalidOperationException($@"The type ""{type}"" is not value object type");
+                throw new InvalidOperationException($@"The type ""{type}"" is not a value object type");
             }
 
+            return UnsafeGetGenericValueObjectType(type);
+        }
+
+        private static Type UnsafeGetGenericValueObjectType(Type type)
+        {
             Type current = type;
 
             while (current.BaseType != typeof(ValueObject))
@@ -25,8 +44,7 @@ namespace Sharp.ValueObject
                 current = current.BaseType;
             }
 
-            Debug.Assert(current.IsGenericType);
-            Debug.Assert(current.GetGenericTypeDefinition() == typeof(SingleValueObject<,>));
+            Debug.Assert(IsValueObjectType(current), $"The type {current} cannot be used as value object");
 
             return current;
         }

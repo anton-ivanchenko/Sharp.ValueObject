@@ -19,7 +19,7 @@ namespace Sharp.ValueObject.Json
         }
 
         public override bool CanConvert(Type typeToConvert)
-            => ValueObject.IsValueObjectType(typeToConvert) || TryGetEnumerableGenericParameter(typeToConvert, out _);
+            => ValueObject.IsSingleValueObjectType(typeToConvert) || TryGetEnumerableGenericParameter(typeToConvert, out _);
 
         public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
         {
@@ -31,9 +31,9 @@ namespace Sharp.ValueObject.Json
 
         private static Func<JsonConverter> CreateFactory(Type typeToConvert)
         {
-            if (ValueObject.IsValueObjectType(typeToConvert))
+            if (ValueObject.IsSingleValueObjectType(typeToConvert))
             {
-                return CreateValueObjectFactory(typeToConvert);
+                return CreateSingleValueObjectFactory(typeToConvert);
             }
 
             if (TryGetEnumerableGenericParameter(typeToConvert, out Type? valueType))
@@ -44,10 +44,10 @@ namespace Sharp.ValueObject.Json
             throw new InvalidOperationException(@$"This type of converter cannot be used to handle ""{typeToConvert}"" type");
         }
 
-        private static Func<JsonConverter> CreateValueObjectFactory(Type typeToConvert)
+        private static Func<JsonConverter> CreateSingleValueObjectFactory(Type typeToConvert)
         {
             Type genericValueObjectType = ValueObject.GetGenericValueObjectType(typeToConvert);
-            Type innerValueType = ValueObject.GetInnerValueType(genericValueObjectType);
+            Type innerValueType = ValueObject.GetSingleValueObjectInnerValueType(genericValueObjectType);
 
             Type[] genericArguments = genericValueObjectType.GetGenericArguments();
             Type converterType = typeof(ValueObjectConverter<,>).MakeGenericType(genericArguments);
@@ -92,7 +92,7 @@ namespace Sharp.ValueObject.Json
             valueObjectType = typeToConvert.GetInterfaces()
                 .Where(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
                 .Select(type => type.GetGenericArguments()[0])
-                .FirstOrDefault(type => ValueObject.IsValueObjectType(type));
+                .FirstOrDefault(type => ValueObject.IsSingleValueObjectType(type));
 
             return valueObjectType != null;
         }

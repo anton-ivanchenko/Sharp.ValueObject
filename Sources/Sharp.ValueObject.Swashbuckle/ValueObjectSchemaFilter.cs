@@ -7,7 +7,7 @@ namespace Sharp.ValueObject.Swashbuckle
     {
         public void Apply(OpenApiSchema schema, SchemaFilterContext context)
         {
-            if (!ValueObject.IsValueObjectType(context.Type))
+            if (!ValueObject.IsSingleValueObjectType(context.Type))
                 return;
 
             if (schema.Properties.Count == 1)

@@ -7,9 +7,15 @@ namespace Sharp.ValueObject.Tests
     public class ValueObjectStaticTests
     {
         [Fact]
-        public void IsValueObjectType_ValueObjectType_ReturnTrue()
+        public void IsValueObjectType_SingleValueObjectType_ReturnTrue()
         {
             Assert.True(ValueObject.IsValueObjectType(typeof(Color)));
+        }
+
+        [Fact]
+        public void IsValueObjectType_ComplexValueObjectType_ReturnTrue()
+        {
+            Assert.True(ValueObject.IsValueObjectType(typeof(Address)));
         }
 
         [Fact]
@@ -19,15 +25,51 @@ namespace Sharp.ValueObject.Tests
         }
 
         [Fact]
-        public void GetInnerValueType_StringValueObject_ReturnString()
+        public void IsSingleValueObjectType_SingleValueObjectType_ReturnTrue()
         {
-            Assert.Equal(typeof(string), ValueObject.GetInnerValueType(typeof(Color)));
+            Assert.True(ValueObject.IsSingleValueObjectType(typeof(Color)));
         }
 
         [Fact]
-        public void GetInnerValueType_IntegerValueObject_ReturnInteger()
+        public void IsSingleValueObjectType_ComplexValueObjectType_ReturnFalse()
         {
-            Assert.Equal(typeof(int), ValueObject.GetInnerValueType(typeof(Number)));
+            Assert.False(ValueObject.IsSingleValueObjectType(typeof(Address)));
+        }
+
+        [Fact]
+        public void IsSingleValueObjectType_NotValueObjectType_ReturnFalse()
+        {
+            Assert.False(ValueObject.IsSingleValueObjectType(typeof(string)));
+        }
+
+        [Fact]
+        public void IsComplexValueObjectType_SingleValueObjectType_ReturnFalse()
+        {
+            Assert.False(ValueObject.IsComplexValueObjectType(typeof(Color)));
+        }
+
+        [Fact]
+        public void IsComplexValueObjectType_ComplexValueObjectType_ReturnTrue()
+        {
+            Assert.True(ValueObject.IsComplexValueObjectType(typeof(Address)));
+        }
+
+        [Fact]
+        public void IsComplexValueObjectType_NotValueObjectType_ReturnFalse()
+        {
+            Assert.False(ValueObject.IsComplexValueObjectType(typeof(string)));
+        }
+
+        [Fact]
+        public void GetSingleValueObjectInnerValueType_StringValueObject_ReturnString()
+        {
+            Assert.Equal(typeof(string), ValueObject.GetSingleValueObjectInnerValueType(typeof(Color)));
+        }
+
+        [Fact]
+        public void GetSingleValueObjectInnerValueType_IntegerValueObject_ReturnInteger()
+        {
+            Assert.Equal(typeof(int), ValueObject.GetSingleValueObjectInnerValueType(typeof(Number)));
         }
 
         [Fact]
@@ -40,6 +82,12 @@ namespace Sharp.ValueObject.Tests
         public void GetGenericValueObjectType_IntegerValueObject_ReturnGenericValueObjectType()
         {
             Assert.Equal(typeof(SingleValueObject<int, Number>), ValueObject.GetGenericValueObjectType(typeof(Number)));
+        }
+
+        [Fact]
+        public void GetGenericValueObjectType_ComplexValueObject_ReturnGenericValueObjectType()
+        {
+            Assert.Equal(typeof(ComplexValueObject<Address>), ValueObject.GetGenericValueObjectType(typeof(Address)));
         }
 
         [Fact]
