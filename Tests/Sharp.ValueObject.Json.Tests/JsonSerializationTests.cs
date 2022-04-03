@@ -62,18 +62,6 @@ namespace Sharp.ValueObject.Json.Tests
             Assert.Equal(colorName, color!.Value);
         }
 
-        [Fact]
-        public void DeserializeStringValueObject_ValueObject_Successfuly()
-        {
-            Color expectedColor = Color.Green;
-
-            string json = $@"{{ ""Value"": ""{expectedColor.Value}"" }}";
-            Color? color = JsonSerializer.Deserialize<Color>(json, _options);
-
-            Assert.NotNull(color);
-            Assert.Equal(expectedColor, color);
-        }
-
         #endregion
 
         #region IntValueObject
