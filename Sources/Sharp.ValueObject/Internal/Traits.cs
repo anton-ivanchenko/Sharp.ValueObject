@@ -1,5 +1,5 @@
 ﻿namespace Sharp.ValueObject.Internal
 {
-    public interface ISingleValueObjectTrait { string Test(); }
-    public interface IComplexValueObjectTrait { }
+    internal interface ISingleValueObjectTrait { }
+    internal interface IComplexValueObjectTrait { }
 }

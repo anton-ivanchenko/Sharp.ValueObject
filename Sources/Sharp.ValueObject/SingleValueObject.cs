@@ -7,9 +7,9 @@ using System.Reflection;
 namespace Sharp.ValueObject
 {
     public abstract partial class SingleValueObject<TValue, TValueObject> : ValueObject
+        , ISingleValueObjectTrait
         , IEquatable<SingleValueObject<TValue, TValueObject>>
         , IEquatable<SingleValueObject<TValue, TValueObject>.Constant>
-        , ISingleValueObjectTrait
         , ICloneable
         where TValue : IEquatable<TValue>
         where TValueObject : SingleValueObject<TValue, TValueObject>
@@ -116,11 +116,6 @@ namespace Sharp.ValueObject
         public TValueObject Clone() => (TValueObject)((ICloneable)this).Clone();
 
         object ICloneable.Clone() => MemberwiseClone();
-
-        public string Test()
-        {
-            throw new NotImplementedException();
-        }
 
         public class Constant : IEquatable<SingleValueObject<TValue, TValueObject>>, IEquatable<Constant>
         {
