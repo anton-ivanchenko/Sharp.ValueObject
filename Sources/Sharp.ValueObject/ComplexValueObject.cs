@@ -42,7 +42,8 @@ namespace Sharp.ValueObject
             ParameterExpression left = Expression.Parameter(typeof(TValueObject), nameof(left));
             ParameterExpression right = Expression.Parameter(typeof(TValueObject), nameof(right));
 
-            List<Expression> body = new();
+            int lambdaBodyMembersCapacity = properties.Length + 1;
+            List<Expression> lambdaBodyMembers = new(lambdaBodyMembersCapacity);
             LabelTarget exitLabel = Expression.Label(typeof(bool));
 
             foreach (var property in properties)
@@ -74,12 +75,14 @@ namespace Sharp.ValueObject
                 }
 
 
-                body.Add(equalityExpression);
+                lambdaBodyMembers.Add(equalityExpression);
             }
 
-            body.Add(Expression.Label(exitLabel, Expression.Constant(true)));
+            lambdaBodyMembers.Add(Expression.Label(exitLabel, Expression.Constant(true)));
+            Debug.Assert(lambdaBodyMembers.Capacity == lambdaBodyMembersCapacity);
 
-            var lambdaMethod = Expression.Lambda<Func<TValueObject?, TValueObject?, bool>>(Expression.Block(body), left, right);
+            var lambdaBody = Expression.Block(lambdaBodyMembers);
+            var lambdaMethod = Expression.Lambda<Func<TValueObject?, TValueObject?, bool>>(lambdaBody, left, right);
 
             return lambdaMethod.Compile();
         }
@@ -89,7 +92,8 @@ namespace Sharp.ValueObject
             ParameterExpression instance = Expression.Parameter(typeof(TValueObject), nameof(instance));
             ParameterExpression hashcode = Expression.Variable(typeof(HashCode), nameof(hashcode));
 
-            List<Expression> lambdaBodyMembers = new(capacity: properties.Length + 1);
+            int lambdaBodyMembersCapacity = properties.Length + 1;
+            List<Expression> lambdaBodyMembers = new(lambdaBodyMembersCapacity);
 
             var addHashCodeMethod = typeof(HashCode).GetMethods()
                 .First(x => x.Name == "Add" && x.GetParameters().Length == 1);
@@ -97,7 +101,6 @@ namespace Sharp.ValueObject
             foreach (var property in properties)
             {
                 var genericAddHashCodeMethod = addHashCodeMethod.MakeGenericMethod(property.PropertyType);
-
                 var callAddHashCode = Expression.Call(hashcode, genericAddHashCodeMethod, Expression.MakeMemberAccess(instance, property));
 
                 lambdaBodyMembers.Add(callAddHashCode);
@@ -107,6 +110,7 @@ namespace Sharp.ValueObject
             Debug.Assert(getHashCodeMethod is not null);
 
             lambdaBodyMembers.Add(Expression.Call(hashcode, getHashCodeMethod));
+            Debug.Assert(lambdaBodyMembers.Capacity == lambdaBodyMembersCapacity);
 
             var lambdaBody = Expression.Block(variables: new[] { hashcode }, lambdaBodyMembers);
             var lambdaMethod = Expression.Lambda<Func<TValueObject, int>>(lambdaBody, instance);
