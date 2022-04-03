@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -21,7 +22,8 @@ namespace Sharp.ValueObject.Json
         {
             var array = JsonElement.ParseValue(ref reader);
 
-            var collectionItems = new List<TValueObject>(capacity: array.GetArrayLength());
+            int collectionItemsCapacity = array.GetArrayLength();
+            var collectionItems = new List<TValueObject>(collectionItemsCapacity);
 
             foreach (var item in array.EnumerateArray())
             {
@@ -36,6 +38,7 @@ namespace Sharp.ValueObject.Json
                 collectionItems.Add(valueObject);
             }
 
+            Debug.Assert(collectionItems.Capacity == collectionItemsCapacity);
             return _collectionFactory.Invoke(collectionItems);
         }
 
