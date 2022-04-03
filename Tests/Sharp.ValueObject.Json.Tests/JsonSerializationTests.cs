@@ -1,4 +1,5 @@
 ﻿using Sharp.ValueObject.Json.Tests.Models;
+using System.Collections.Generic;
 using System.Text.Json;
 using Xunit;
 
@@ -85,6 +86,54 @@ namespace Sharp.ValueObject.Json.Tests
 
             Assert.NotNull(number);
             Assert.Equal(expectedNumber, number);
+        }
+
+        #endregion
+
+        #region Collections
+
+        [Fact]
+        public void Serialize_ArrayOfStringValueObjects_Successfully()
+        {
+            var colors = new Color[] { Color.Red, Color.Green, Color.Blue };
+            string json = JsonSerializer.Serialize(colors, _options);
+
+            Assert.Equal(@$"[""{Color.Red}"",""{Color.Green}"",""{Color.Blue}""]", json);
+        }
+
+        [Fact]
+        public void Deserialize_ArrayOfStringValueObjects_Successfully()
+        {
+            string json = @$"[""RED"",""Green"",""blue""]";
+            var colors = JsonSerializer.Deserialize<Color[]>(json, _options);
+
+            Assert.NotNull(colors);
+            Assert.True(colors!.Length == 3);
+            Assert.Equal(Color.Red.Value, colors[0].Value);
+            Assert.Equal(Color.Green.Value, colors[1].Value);
+            Assert.Equal(Color.Blue.Value, colors[2].Value);
+        }
+
+        [Fact]
+        public void Serialize_ListOfStringValueObjects_Successfully()
+        {
+            var colors = new List<Color> { Color.Red, Color.Green, Color.Blue };
+            string json = JsonSerializer.Serialize(colors, _options);
+
+            Assert.Equal(@$"[""{Color.Red}"",""{Color.Green}"",""{Color.Blue}""]", json);
+        }
+
+        [Fact]
+        public void Deserialize_ListOfStringValueObjects_Successfully()
+        {
+            string json = @$"[""{Color.Red}"",""{Color.Green}"",""{Color.Blue}""]";
+            var colors = JsonSerializer.Deserialize<List<Color>>(json, _options);
+
+            Assert.NotNull(colors);
+            Assert.True(colors!.Count == 3);
+            Assert.Equal(Color.Red.Value, colors[0].Value);
+            Assert.Equal(Color.Green.Value, colors[1].Value);
+            Assert.Equal(Color.Blue.Value, colors[2].Value);
         }
 
         #endregion
