@@ -11,7 +11,7 @@ namespace Sharp.ValueObject.Tests
             var address1 = new Address("UA", "Kyiv", 0);
             var address2 = new Address("UA", "Kyiv", 0);
 
-            Assert.True(address1.Equals(address2));
+            Assert.Equal(address1, address2);
         }
 
         [Fact]
@@ -20,7 +20,7 @@ namespace Sharp.ValueObject.Tests
             var address1 = new Address("UA", "Kyiv", 0);
             var address2 = new Address("FR", "Paris", 0);
 
-            Assert.False(address1.Equals(address2));
+            Assert.NotEqual(address1, address2);
         }
 
         [Fact]
@@ -29,7 +29,7 @@ namespace Sharp.ValueObject.Tests
             var address1 = new Address("UA", null, 0);
             var address2 = new Address("UA", null, 0);
 
-            Assert.True(address1.Equals(address2));
+            Assert.Equal(address1, address2);
         }
 
         [Fact]
@@ -38,7 +38,7 @@ namespace Sharp.ValueObject.Tests
             var address1 = new Address("UA", null, 0);
             var address2 = new Address("UA", "Paris", 0);
 
-            Assert.False(address1.Equals(address2));
+            Assert.NotEqual(address1, address2);
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace Sharp.ValueObject.Tests
             var address1 = new Address("UA", "Kyiv", 0);
             var address2 = new Address("UA", null, 0);
 
-            Assert.False(address1.Equals(address2));
+            Assert.NotEqual(address1, address2);
         }
 
         [Fact]
