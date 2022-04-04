@@ -24,6 +24,24 @@ namespace Sharp.ValueObject.Tests
         }
 
         [Fact]
+        public void Equals_EqualComplexValues_ReturnTrue()
+        {
+            var person1 = new Person(new("Alex", "Gordon"), new(25), "empty");
+            var person2 = new Person(new("Alex", "Gordon"), new(25), "empty");
+
+            Assert.Equal(person1, person2);
+        }
+
+        [Fact]
+        public void Equals_NotEqualComplexValues_ReturnFalse()
+        {
+            var person1 = new Person(new("Alex", "Novicov"), new(25), "empty");
+            var person2 = new Person(new("Alex", "Gordon"), new(25), "empty");
+
+            Assert.NotEqual(person1, person2);
+        }
+
+        [Fact]
         public void Equals_BothHaveNullValue_NoException()
         {
             var address1 = new Address("UA", null, 0);

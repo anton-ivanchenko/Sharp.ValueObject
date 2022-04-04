@@ -48,8 +48,10 @@ namespace Sharp.ValueObject
 
             foreach (var property in properties)
             {
-                var propertyEquatableMethod = typeof(IEquatable<>)
-                    .MakeGenericType(property.PropertyType)
+                var propertyEquatableMethod = property.PropertyType
+                    .GetInterfaces()
+                    .Where(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEquatable<>))
+                    .First(x => x.GetGenericArguments()[0].IsAssignableFrom(property.PropertyType))
                     .GetMethod("Equals");
 
                 Debug.Assert(propertyEquatableMethod is not null);
