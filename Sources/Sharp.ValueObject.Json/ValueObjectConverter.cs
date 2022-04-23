@@ -20,9 +20,11 @@ namespace Sharp.ValueObject.Json
         {
             TValue? value = JsonSerializer.Deserialize<TValue>(ref reader, options);
 
-            return value is not null
-                ? SingleValueObject<TValue, TValueObject>.Create(value, EqualityComparer)
-                : null;
+            if (value is null)
+                return null;
+
+            // TODO: The following method tries to find a constant value, which is not necessary for numeric types ​​with a public constructor
+            return SingleValueObject<TValue, TValueObject>.Create(value, EqualityComparer);
         }
 
         public override void Write(Utf8JsonWriter writer, TValueObject valueObject, JsonSerializerOptions options)
