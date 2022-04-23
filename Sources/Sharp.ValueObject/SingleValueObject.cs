@@ -12,10 +12,13 @@ namespace Sharp.ValueObject
         where TValue : IEquatable<TValue>
         where TValueObject : SingleValueObject<TValue, TValueObject>
     {
+        private static readonly bool _valueObjectFactoryIsPublic;
+        private static readonly Func<TValue, TValueObject> _valueObjectFactory;
         private static readonly IReadOnlyCollection<Constant> _declaredConstants;
 
         static SingleValueObject()
         {
+            _valueObjectFactory = ReflectionHelper.GenerateConstructorWithValueParameter<TValue, TValueObject>(out _valueObjectFactoryIsPublic);
             _declaredConstants = ReflectionHelper.ReflectConstants<TValue, TValueObject>();
         }
 
@@ -64,6 +67,24 @@ namespace Sharp.ValueObject
             return false;
         }
 
+        public static TValueObject Create(TValue value)
+            => Create(value, EqualityComparer<TValue>.Default);
+
+        public static TValueObject Create(TValue value, IEqualityComparer<TValue> comparer)
+        {
+            if (TryGetDeclaredValue(value, comparer, out TValueObject? valueObject))
+            {
+                return valueObject;
+            }
+
+            if (_valueObjectFactoryIsPublic)
+            {
+                return _valueObjectFactory.Invoke(value);
+            }
+
+            throw new InvalidOperationException($@"The value ""{value}"" cannot be used to create instance of {typeof(TValueObject)}");
+        }
+
         public static bool operator ==(SingleValueObject<TValue, TValueObject>? left, SingleValueObject<TValue, TValueObject>? right)
             => left is null ? right is null : left.Equals(right);
 
@@ -110,13 +131,6 @@ namespace Sharp.ValueObject
 
         public class Constant : IEquatable<SingleValueObject<TValue, TValueObject>>, IEquatable<Constant>
         {
-            private static readonly Func<TValue, TValueObject> _valueObjectFactory;
-
-            static Constant()
-            {
-                _valueObjectFactory = ReflectionHelper.GenerateConstructorWithValueParameter<TValue, TValueObject>();
-            }
-
             public static implicit operator TValueObject(Constant constant)
                 => _valueObjectFactory.Invoke(constant.Value);
 

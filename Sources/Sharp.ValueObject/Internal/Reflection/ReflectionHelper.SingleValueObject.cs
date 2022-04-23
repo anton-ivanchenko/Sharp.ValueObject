@@ -21,7 +21,7 @@ namespace Sharp.ValueObject.Internal.Reflection
             return new ReadOnlyCollection<SingleValueObject<TValue, TValueObject>.Constant>(constants);
         }
 
-        public static Func<TValue, TValueObject> GenerateConstructorWithValueParameter<TValue, TValueObject>()
+        public static Func<TValue, TValueObject> GenerateConstructorWithValueParameter<TValue, TValueObject>(out bool isPublic)
             where TValue : IEquatable<TValue>
             where TValueObject : SingleValueObject<TValue, TValueObject>
         {
@@ -37,6 +37,7 @@ namespace Sharp.ValueObject.Internal.Reflection
                 Expression.New(constructorToInvoke, valueParameter),
                 valueParameter);
 
+            isPublic = constructorToInvoke.IsPublic;
             return factoryMethod.Compile();
         }
     }

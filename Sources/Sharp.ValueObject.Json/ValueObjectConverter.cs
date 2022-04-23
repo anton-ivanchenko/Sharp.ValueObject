@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Sharp.ValueObject.Json
@@ -8,23 +7,6 @@ namespace Sharp.ValueObject.Json
         where TValue : IEquatable<TValue>
         where TValueObject : SingleValueObject<TValue, TValueObject>
     {
-        private static readonly Func<TValue, TValueObject>? _factory;
-
-        static ValueObjectConverter()
-        {
-            var constructor = typeof(TValueObject).GetConstructor(new[] { typeof(TValue) });
-
-            if (constructor != null)
-            {
-                var parameter = Expression.Parameter(typeof(TValue));
-
-                var expression = Expression.Lambda<Func<TValue, TValueObject>>(
-                    Expression.New(constructor, parameter), parameter);
-
-                _factory = expression.Compile();
-            }
-        }
-
         public ValueObjectConverter() : this(EqualityComparer<TValue>.Default) { }
 
         public ValueObjectConverter(IEqualityComparer<TValue> equalityComparer)
@@ -38,29 +20,14 @@ namespace Sharp.ValueObject.Json
         {
             TValue? value = JsonSerializer.Deserialize<TValue>(ref reader, options);
 
-            return value != null
-                ? ConvertToValueObject(value)
+            return value is not null
+                ? SingleValueObject<TValue, TValueObject>.Create(value, EqualityComparer)
                 : null;
         }
 
         public override void Write(Utf8JsonWriter writer, TValueObject valueObject, JsonSerializerOptions options)
         {
             JsonSerializer.Serialize(writer, valueObject.Value, options);
-        }
-
-        protected virtual TValueObject ConvertToValueObject(TValue value)
-        {
-            if (SingleValueObject<TValue, TValueObject>.TryGetDeclaredValue(value, EqualityComparer, out TValueObject? valueObject))
-            {
-                return valueObject;
-            }
-
-            if (_factory != null)
-            {
-                return _factory.Invoke(value);
-            }
-
-            throw new InvalidOperationException($@"The value ""{value}"" cannot be used for create object of ""{typeof(TValueObject)}"" type");
         }
     }
 }
