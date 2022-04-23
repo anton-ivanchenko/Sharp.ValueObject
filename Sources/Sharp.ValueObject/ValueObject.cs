@@ -1,5 +1,4 @@
 ﻿using Sharp.ValueObject.Internal;
-using System.Diagnostics;
 
 namespace Sharp.ValueObject
 {
@@ -18,7 +17,7 @@ namespace Sharp.ValueObject
         {
             if (!IsSingleValueObjectType(type))
             {
-                throw new InvalidOperationException($@"The type ""{type}"" is not a single value object type");
+                throw new InvalidOperationException($"The type {type} is not a single value object type");
             }
 
             return UnsafeGetGenericValueObjectType(type).GetGenericArguments()[0];
@@ -28,7 +27,7 @@ namespace Sharp.ValueObject
         {
             if (!IsValueObjectType(type))
             {
-                throw new InvalidOperationException($@"The type ""{type}"" is not a value object type");
+                throw new InvalidOperationException($@"The type {type} is not a value object type");
             }
 
             return UnsafeGetGenericValueObjectType(type);
@@ -40,11 +39,8 @@ namespace Sharp.ValueObject
 
             while (current.BaseType != typeof(ValueObject))
             {
-                Debug.Assert(current.BaseType != null);
-                current = current.BaseType;
+                current = current.BaseType!;
             }
-
-            Debug.Assert(IsValueObjectType(current), $"The type {current} cannot be used as value object");
 
             return current;
         }

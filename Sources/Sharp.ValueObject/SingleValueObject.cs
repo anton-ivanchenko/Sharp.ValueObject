@@ -1,8 +1,6 @@
 ﻿using Sharp.ValueObject.Internal;
-using System.Collections.ObjectModel;
+using Sharp.ValueObject.Internal.Reflection;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
-using System.Reflection;
 
 namespace Sharp.ValueObject
 {
@@ -18,14 +16,7 @@ namespace Sharp.ValueObject
 
         static SingleValueObject()
         {
-            var definedConstants = typeof(TValueObject)
-                .GetProperties(BindingFlags.Public | BindingFlags.Static | BindingFlags.GetProperty)
-                .Where(p => typeof(Constant).IsAssignableFrom(p.PropertyType))
-                .Select(p => p.GetValue(null))
-                .Cast<Constant>()
-                .ToList();
-
-            _declaredConstants = new ReadOnlyCollection<Constant>(definedConstants);
+            _declaredConstants = ReflectionHelper.ReflectConstants<TValue, TValueObject>();
         }
 
         public static IEnumerable<Constant> GetDeclaredConstants() => _declaredConstants;
@@ -123,28 +114,7 @@ namespace Sharp.ValueObject
 
             static Constant()
             {
-                var constructorToInvoke = GetConstructorWithValueParameter();
-
-                var valueParameter = Expression.Parameter(typeof(TValue));
-
-                var factoryMethod = Expression.Lambda<Func<TValue, TValueObject>>(
-                    Expression.New(constructorToInvoke, valueParameter),
-                    valueParameter);
-
-                _valueObjectFactory = factoryMethod.Compile();
-            }
-
-            private static ConstructorInfo GetConstructorWithValueParameter()
-            {
-                foreach (var constructor in typeof(TValueObject).GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-                {
-                    var parameters = constructor.GetParameters();
-
-                    if (parameters.Length == 1 && parameters[0].ParameterType == typeof(TValue))
-                        return constructor;
-                }
-
-                throw new ApplicationException($@"The type ""{typeof(TValueObject)}"" does not have constructor with single parameter of ""{typeof(TValue)}"" type");
+                _valueObjectFactory = ReflectionHelper.GenerateConstructorWithValueParameter<TValue, TValueObject>();
             }
 
             public static implicit operator TValueObject(Constant constant)
