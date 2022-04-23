@@ -13,6 +13,15 @@ namespace Sharp.ValueObject
         public static bool IsComplexValueObjectType(Type type)
             => typeof(IComplexValueObjectTrait).IsAssignableFrom(type);
 
+        public static bool IsValueObjectCollectionType(Type type)
+            => typeof(IEnumerable<ValueObject>).IsAssignableFrom(type);
+
+        public static bool IsSingleValueObjectCollectionType(Type type)
+            => typeof(IEnumerable<ISingleValueObjectTrait>).IsAssignableFrom(type);
+
+        public static bool IsComplexValueObjectCollectionType(Type type)
+            => typeof(IEnumerable<IComplexValueObjectTrait>).IsAssignableFrom(type);
+
         public static Type GetSingleValueObjectInnerValueType(Type type)
         {
             if (!IsSingleValueObjectType(type))
