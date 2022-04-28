@@ -1,5 +1,6 @@
 ﻿using Sharp.ValueObject.Internal;
 using Sharp.ValueObject.Internal.Reflection;
+using System;
 using System.Reflection;
 
 namespace Sharp.ValueObject

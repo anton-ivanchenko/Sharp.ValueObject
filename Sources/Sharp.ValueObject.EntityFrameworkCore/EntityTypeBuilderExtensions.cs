@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
 using System.Linq.Expressions;
 
 namespace Sharp.ValueObject.EntityFrameworkCore
@@ -9,7 +10,7 @@ namespace Sharp.ValueObject.EntityFrameworkCore
             where TEntity : class
             where TValueObject : ValueObject
         {
-            return new ValueObjectBuilder<TEntity, TValueObject>(propertyExpression, builder, builder.OwnsOne(propertyExpression));
+            return new ValueObjectBuilder<TEntity, TValueObject>(propertyExpression, builder, builder.OwnsOne(propertyExpression)!);
         }
     }
 }

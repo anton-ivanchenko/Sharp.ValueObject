@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System;
 using System.Linq.Expressions;
 
 namespace Sharp.ValueObject.EntityFrameworkCore

@@ -1,4 +1,6 @@
 ﻿using Sharp.ValueObject.Json.Internal;
+using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -18,14 +20,15 @@ namespace Sharp.ValueObject.Json
 
         public override TCollection Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var array = JsonElement.ParseValue(ref reader);
+            using var document = JsonDocument.ParseValue(ref reader);
+            var array = document.RootElement;
 
             var collectionItems = new List<TValueObject?>(capacity: array.GetArrayLength());
 
             foreach (var item in array.EnumerateArray())
             {
                 string rawJsonValue = item.GetRawText();
-                TValueObject? valueObject = JsonSerializer.Deserialize<TValueObject>(rawJsonValue, options);
+                var valueObject = JsonSerializer.Deserialize<TValueObject>(rawJsonValue, options);
                 collectionItems.Add(valueObject);
             }
 

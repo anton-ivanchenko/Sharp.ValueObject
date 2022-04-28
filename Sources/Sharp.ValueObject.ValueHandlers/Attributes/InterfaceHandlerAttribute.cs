@@ -1,4 +1,6 @@
-﻿namespace Sharp.ValueObject.ValueHandlers.Attributes
+﻿using System;
+
+namespace Sharp.ValueObject.ValueHandlers.Attributes
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
     public sealed class InterfaceHandlerAttribute : Attribute

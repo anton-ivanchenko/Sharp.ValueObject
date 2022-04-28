@@ -1,4 +1,5 @@
 ﻿using Sharp.ValueObject.ValueHandlers.Internal;
+using System;
 
 namespace Sharp.ValueObject.ValueHandlers
 {
@@ -8,8 +9,11 @@ namespace Sharp.ValueObject.ValueHandlers
             where TValue : IEquatable<TValue>
             where TValueObject : SingleValueObject<TValue, TValueObject>
         {
-            ArgumentNullException.ThrowIfNull(valueObject, nameof(valueObject));
-            ArgumentNullException.ThrowIfNull(handler, nameof(handler));
+            if (valueObject is null)
+                throw new ArgumentNullException(nameof(valueObject));
+
+            if (handler is null)
+                throw new ArgumentNullException(nameof(handler));
 
             return InternalImplementation<TValue, TValueObject, TResult>.HandlerMethodInvoker.Invoke(valueObject, handler);
         }
@@ -23,8 +27,7 @@ namespace Sharp.ValueObject.ValueHandlers
             static InternalImplementation()
             {
                 _methodInvoker = new Lazy<Func<SingleValueObject<TValue, TValueObject>, ISingleValueObjectHandler<TValueObject, TResult>, TResult>>(
-                    valueFactory: ReflectionHelper.GenerateHandlerMethodInvoker<TValue, TValueObject, TResult>,
-                    mode: LazyThreadSafetyMode.ExecutionAndPublication);
+                    valueFactory: ReflectionHelper.GenerateHandlerMethodInvoker<TValue, TValueObject, TResult>);
             }
 
             public static Func<SingleValueObject<TValue, TValueObject>, ISingleValueObjectHandler<TValueObject, TResult>, TResult> HandlerMethodInvoker => _methodInvoker.Value;

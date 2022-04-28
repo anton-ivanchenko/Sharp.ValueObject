@@ -1,4 +1,6 @@
-﻿namespace Sharp.ValueObject.ValueHandlers.Attributes
+﻿using System;
+
+namespace Sharp.ValueObject.ValueHandlers.Attributes
 {
     [AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
     public sealed class MethodHandlerAttribute : Attribute
