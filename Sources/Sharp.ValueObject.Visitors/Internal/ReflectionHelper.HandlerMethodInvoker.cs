@@ -1,22 +1,22 @@
-﻿using Sharp.ValueObject.ValueHandlers.Attributes;
+﻿using Sharp.ValueObject.Visitors.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Sharp.ValueObject.ValueHandlers.Internal
+namespace Sharp.ValueObject.Visitors.Internal
 {
     internal static class ReflectionHelper
     {
-        public static Func<SingleValueObject<TValue, TValueObject>, ISingleValueObjectHandler<TValueObject, TResult>, TResult> GenerateHandlerMethodInvoker<TValue, TValueObject, TResult>()
+        public static Func<SingleValueObject<TValue, TValueObject>, ISingleValueObjectVisitor<TValueObject, TResult>, TResult> GenerateVisitMethod<TValue, TValueObject, TResult>()
             where TValue : IEquatable<TValue>
             where TValueObject : SingleValueObject<TValue, TValueObject>
         {
             var valueObjectType = typeof(TValueObject);
 
             var valueObjectAttribute = valueObjectType
-                .GetCustomAttribute<InterfaceHandlerAttribute>();
+                .GetCustomAttribute<VisitorInterfaceAttribute>();
 
             if (valueObjectAttribute is null)
                 throw new InvalidOperationException($"The type {valueObjectType} does not have declared interface handler type");
@@ -24,7 +24,7 @@ namespace Sharp.ValueObject.ValueHandlers.Internal
             Type handlerType = GetHandlerType<TResult>(valueObjectAttribute);
 
             var valueObjectVariable = Expression.Parameter(typeof(SingleValueObject<TValue, TValueObject>));
-            var handlerVariable = Expression.Parameter(typeof(ISingleValueObjectHandler<TValueObject, TResult>));
+            var handlerVariable = Expression.Parameter(typeof(ISingleValueObjectVisitor<TValueObject, TResult>));
 
             var specificValueObjectVariable = Expression.Variable(valueObjectType);
             var specificHandlerVariable = Expression.Variable(handlerType);
@@ -45,7 +45,7 @@ namespace Sharp.ValueObject.ValueHandlers.Internal
             foreach (var constantMember in constantMembers)
             {
                 var constantAttribute = constantMember
-                    .GetCustomAttribute<MethodHandlerAttribute>();
+                    .GetCustomAttribute<VisitorMethodAttribute>();
 
                 if (constantAttribute is null)
                     continue;
@@ -60,29 +60,29 @@ namespace Sharp.ValueObject.ValueHandlers.Internal
                 bodyExpressions.Add(constantExpression);
             }
 
-            var defaultTargetMethod = GetTargetMethod(handlerType, valueObjectAttribute.DefaultMethodName);
+            var defaultTargetMethod = GetTargetMethod(handlerType, valueObjectAttribute.DefaultVisitorMethod);
             var defaultTargetMethodCall = CreateCallTargetMethodExpression(specificHandlerVariable, defaultTargetMethod, specificValueObjectVariable);
 
             bodyExpressions.Add(Expression.Label(exitLabel, defaultTargetMethodCall));
 
             var lambdaBody = Expression.Block(new[] { specificValueObjectVariable, specificHandlerVariable }, bodyExpressions);
-            var lambdaMethod = Expression.Lambda<Func<SingleValueObject<TValue, TValueObject>, ISingleValueObjectHandler<TValueObject, TResult>, TResult>>(lambdaBody, new[] { valueObjectVariable, handlerVariable });
+            var lambdaMethod = Expression.Lambda<Func<SingleValueObject<TValue, TValueObject>, ISingleValueObjectVisitor<TValueObject, TResult>, TResult>>(lambdaBody, new[] { valueObjectVariable, handlerVariable });
 
             return lambdaMethod.Compile();
         }
 
-        private static Type GetHandlerType<TResult>(InterfaceHandlerAttribute valueObjectAttribute)
+        private static Type GetHandlerType<TResult>(VisitorInterfaceAttribute valueObjectAttribute)
         {
-            var specifiedHandlerType = valueObjectAttribute.HandlerInterface;
+            var specifiedHandlerType = valueObjectAttribute.InterfaceType;
 
             var baseHandlerInterface = specifiedHandlerType.GetInterfaces()
-                .FirstOrDefault(x => x.IsInterface && x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ISingleValueObjectHandler<,>));
+                .FirstOrDefault(x => x.IsInterface && x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ISingleValueObjectVisitor<,>));
 
             if (baseHandlerInterface == null)
                 throw new InvalidOperationException($"The type {specifiedHandlerType} cannot be used as single value object handler");
 
             if (specifiedHandlerType.IsGenericType && !specifiedHandlerType.IsConstructedGenericType)
-                return valueObjectAttribute.HandlerInterface.MakeGenericType(typeof(TResult));
+                return valueObjectAttribute.InterfaceType.MakeGenericType(typeof(TResult));
 
             return specifiedHandlerType;
         }

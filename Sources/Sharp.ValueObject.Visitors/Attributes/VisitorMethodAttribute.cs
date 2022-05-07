@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace Sharp.ValueObject.ValueHandlers.Attributes
+namespace Sharp.ValueObject.Visitors.Attributes
 {
     [AttributeUsage(AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
-    public sealed class MethodHandlerAttribute : Attribute
+    public sealed class VisitorMethodAttribute : Attribute
     {
-        public MethodHandlerAttribute(string methodName)
+        public VisitorMethodAttribute(string methodName)
         {
             MethodName = methodName;
         }

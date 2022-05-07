@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Sources\Sharp.ValueObject.ValueHandlers\Sharp.ValueObject.ValueHandlers.csproj" />
+    <ProjectReference Include="..\..\Sources\Sharp.ValueObject.Visitors\Sharp.ValueObject.Visitors.csproj" />
   </ItemGroup>
 
 </Project>
