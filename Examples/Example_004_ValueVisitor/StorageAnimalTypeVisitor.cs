@@ -13,10 +13,13 @@
 
         public Animal ReleaseAnimal()
         {
-            if (_animal is null)
+            var realesedAnimal = _animal;
+
+            if (realesedAnimal is null)
                 throw new InvalidOperationException($"");
 
-            return Interlocked.Exchange(ref _animal, null);
+            _animal = null;
+            return realesedAnimal;
         }
 
         public void VisitCat()
@@ -40,9 +43,6 @@
             _storage.Dogs -= 1;
             _animal = new Dog();
         }
-
-        public void VisitOtherAnimalType(AnimalType animal)
-            => throw new InvalidOperationException($"Wrong animal type: {animal}");
 
         private static void ThrowNotEnoughException()
             => throw new InvalidOperationException($"There is not enough items in storage");

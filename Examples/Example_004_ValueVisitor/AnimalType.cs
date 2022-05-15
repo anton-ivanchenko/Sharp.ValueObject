@@ -23,7 +23,5 @@ namespace Example_004_ValueVisitor
 
         [VisitorHandler(nameof(AnimalType.Dog))]
         void VisitDog();
-
-        void VisitOtherAnimalType(AnimalType animal);
     }
 }
