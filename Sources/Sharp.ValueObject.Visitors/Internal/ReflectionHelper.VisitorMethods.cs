@@ -9,8 +9,8 @@ namespace Sharp.ValueObject.Visitors
 {
     internal static class ReflectionHelper
     {
-        private static ConstructorInfo _invalidOperationExceptionConstructor;
-        private static MethodInfo _formatWithTwoParamsMethod;
+        private static readonly ConstructorInfo _invalidOperationExceptionConstructor;
+        private static readonly MethodInfo _formatWithTwoParamsMethod;
 
         static ReflectionHelper()
         {
