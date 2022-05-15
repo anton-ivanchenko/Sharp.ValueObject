@@ -1,26 +1,29 @@
-﻿using Sharp.ValueObject;
+﻿using Sharp.ValueObject.SingleValueObjects;
 using Sharp.ValueObject.Visitors;
 using Sharp.ValueObject.Visitors.Attributes;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Example_004_ValueVisitor
 {
-    public interface IAnimalTypeVisitor<TResult> : ISingleValueObjectVisitor<AnimalType, TResult>
+    public sealed class AnimalType : StringValueObject<AnimalType>
     {
-        TResult VisitCat();
-        TResult VisitDog();
-
-        TResult VisitOtherAnimalType(AnimalType animal);
-    }
-
-    [VisitorInterface(typeof(IAnimalTypeVisitor<>), nameof(IAnimalTypeVisitor<object>.VisitOtherAnimalType))]
-    public class AnimalType : SingleValueObject<string, AnimalType>
-    {
-        [VisitorMethod(nameof(IAnimalTypeVisitor<object>.VisitCat))]
         public static Constant Cat { get; } = new("cat");
 
-        [VisitorMethod(nameof(IAnimalTypeVisitor<object>.VisitDog))]
         public static Constant Dog { get; } = new("dog");
 
-        protected AnimalType(string value) : base(value) { }
+        [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members")]
+        private AnimalType(string value) : base(value) { }
+    }
+
+    [VisitorTarget(typeof(AnimalType))]
+    public interface IAnimalTypeVisitor : ISingleValueObjectVisitor<AnimalType>
+    {
+        [VisitorHandler(nameof(AnimalType.Cat))]
+        void VisitCat();
+
+        [VisitorHandler(nameof(AnimalType.Dog))]
+        void VisitDog();
+
+        void VisitOtherAnimalType(AnimalType animal);
     }
 }

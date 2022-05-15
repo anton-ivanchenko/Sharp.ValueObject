@@ -1,36 +1,47 @@
+using Moq;
 using Sharp.ValueObject.Visitors.Tests.Models;
-using Sharp.ValueObject.Visitors.Tests.Visitors.Color;
+using Sharp.ValueObject.Visitors.Tests.Visitors;
+using System.IO;
 using Xunit;
 
 namespace Sharp.ValueObject.Visitors.Tests
 {
     public class SingleValueObjectExtensionsTests
     {
+        private readonly Mock<TextWriter> _textWriter;
+        private readonly TextWriterColorVisitor _visitor;
+
+        public SingleValueObjectExtensionsTests()
+        {
+            _textWriter = new Mock<TextWriter>();
+            _visitor = new(_textWriter.Object);
+        }
+
         [Fact]
         public void HandleValue_SimpleMessageColorHandler_PropertyWithHandler_CallSpecificMethod()
         {
             Color color = Color.Blue;
-            string messageText = color.Accept(new SimpleMessageColorVisitor());
+            color.Accept(_visitor);
 
-            Assert.Equal("Specific blue color handler", messageText);
+            _textWriter.Verify(x => x.WriteLine("Specific blue color handler"));
         }
 
         [Fact]
         public void HandleValue_SimpleMessageColorHandler_PropertyWithoutHandler_CallDefaultMethod()
         {
             Color color = Color.Transparent;
-            string messageText = color.Accept(new SimpleMessageColorVisitor());
+            color.Accept(_visitor);
 
-            Assert.Equal("General transparent color handler", messageText);
+            _textWriter.Verify(x => x.WriteLine("General transparent color handler"));
         }
 
         [Fact]
         public void HandleValue_SimpleMessageColorHandler_UnknownColor_CallDefaultMethod()
         {
             Color color = new("yellow");
-            string messageText = color.Accept(new SimpleMessageColorVisitor());
+            color.Accept(_visitor);
 
-            Assert.Equal("General yellow color handler", messageText);
+            _textWriter.Verify(x => x.WriteLine("General yellow color handler"));
         }
     }
 }

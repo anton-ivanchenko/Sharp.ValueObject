@@ -1,15 +1,25 @@
 ﻿namespace Example_004_ValueVisitor
 {
-    public class StorageAnimalTypeVisitor : IAnimalTypeVisitor<Animal>
+    public class StorageAnimalTypeVisitor : IAnimalTypeVisitor
     {
         private readonly Storage _storage;
+        private Animal? _animal;
 
         public StorageAnimalTypeVisitor(Storage storage)
         {
             _storage = storage;
+            _animal = null;
         }
 
-        public Animal VisitCat()
+        public Animal ReleaseAnimal()
+        {
+            if (_animal is null)
+                throw new InvalidOperationException($"");
+
+            return Interlocked.Exchange(ref _animal, null);
+        }
+
+        public void VisitCat()
         {
             if (_storage.Cats <= 0)
             {
@@ -17,10 +27,10 @@
             }
 
             _storage.Cats -= 1;
-            return new Cat();
+            _animal = new Cat();
         }
 
-        public Animal VisitDog()
+        public void VisitDog()
         {
             if (_storage.Dogs <= 0)
             {
@@ -28,13 +38,13 @@
             }
 
             _storage.Dogs -= 1;
-            return new Dog();
+            _animal = new Dog();
         }
 
-        public Animal VisitOtherAnimalType(AnimalType animal)
+        public void VisitOtherAnimalType(AnimalType animal)
             => throw new InvalidOperationException($"Wrong animal type: {animal}");
 
-        private void ThrowNotEnoughException()
+        private static void ThrowNotEnoughException()
             => throw new InvalidOperationException($"There is not enough items in storage");
     }
 }

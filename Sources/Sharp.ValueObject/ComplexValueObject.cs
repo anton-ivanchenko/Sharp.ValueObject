@@ -1,12 +1,13 @@
-﻿using Sharp.ValueObject.Internal;
-using Sharp.ValueObject.Internal.Reflection;
+﻿using Sharp.ValueObject.Internal.Reflection;
 using System;
 using System.Reflection;
 
 namespace Sharp.ValueObject
 {
+    public interface IComplexValueObject { }
+
     public class ComplexValueObject<TValueObject> : ValueObject
-        , IComplexValueObjectTrait
+        , IComplexValueObject
         , IEquatable<ComplexValueObject<TValueObject>>
         where TValueObject : ComplexValueObject<TValueObject>
     {

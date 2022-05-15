@@ -1,5 +1,4 @@
-﻿using Sharp.ValueObject.Internal;
-using Sharp.ValueObject.Internal.Reflection;
+﻿using Sharp.ValueObject.Internal.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -7,8 +6,10 @@ using System.Linq;
 
 namespace Sharp.ValueObject
 {
+    public interface ISingleValueObject { }
+
     public abstract partial class SingleValueObject<TValue, TValueObject> : ValueObject
-        , ISingleValueObjectTrait
+        , ISingleValueObject
         , IEquatable<SingleValueObject<TValue, TValueObject>>
         , IEquatable<SingleValueObject<TValue, TValueObject>.Constant>
         , ICloneable

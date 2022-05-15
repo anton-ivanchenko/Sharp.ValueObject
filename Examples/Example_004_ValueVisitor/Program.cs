@@ -10,7 +10,9 @@ var animalTypeHandler = new StorageAnimalTypeVisitor(storage);
 
 foreach (var animalType in animalTypes)
 {
-    var animal = animalType.Accept(animalTypeHandler);
+    animalType.Accept(animalTypeHandler);
+    var animal = animalTypeHandler.ReleaseAnimal();
+
     Console.WriteLine($"The {animal.GetType().Name} was created");
 }
 
