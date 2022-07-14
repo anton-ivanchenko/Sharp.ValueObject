@@ -4,7 +4,7 @@ string directionString = "left";
 //string directionString = "up";
 //string directionString = "top";
 
-if (!Direction.TryParseCaseInsensitive(directionString, out Direction? direction))
+if (!Direction.TryParse(directionString, out Direction? direction))
 {
     Console.WriteLine("Wrong direction");
     return;

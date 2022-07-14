@@ -6,44 +6,44 @@ namespace Sharp.ValueObject.SingleValueObjects
     public abstract class StringValueObject<TValueObject> : SingleValueObject<string, TValueObject>
         where TValueObject : SingleValueObject<string, TValueObject>
     {
+        public static TValueObject Parse(string value)
+        {
+            if (!TryParse(value, out var valueObject))
+                throw new InvalidOperationException();
+
+            return valueObject;
+        }
+
+        public static TValueObject ParseOrCreate(string value)
+        {
+            if (!TryParseOrCreate(value, out var valueObject))
+                throw new InvalidOperationException();
+
+            return valueObject;
+        }
+
         public static bool TryParse(string value, [NotNullWhen(true)] out TValueObject? instance)
             => TryGetDeclaredValue(value, out instance);
 
-        public static bool TryParseCaseInsensitive(string value, [NotNullWhen(true)] out TValueObject? instance)
-            => TryGetDeclaredValue(value, StringComparer.OrdinalIgnoreCase, out instance);
-
-        public static bool TryGetDeclaredConstantCaseInsensitive(string value, [NotNullWhen(true)] out Constant? constant)
-            => TryGetDeclaredConstant(value, StringComparer.OrdinalIgnoreCase, out constant);
-
-        public static bool TryGetDeclaredConstantCaseInsensitive<TConstant>(string value, [NotNullWhen(true)] out TConstant? constant)
-            where TConstant : Constant => TryGetDeclaredConstant(value, StringComparer.OrdinalIgnoreCase, out constant);
-
-        public static TValueObject CreateCaseInsensitive(string value)
-            => Create(value, StringComparer.OrdinalIgnoreCase);
-
-        protected StringValueObject(string value) : base(value) { }
-
-        public bool EqualsCaseInsensitive(object? other)
+        public static bool TryParseOrCreate(string value, [NotNullWhen(true)] out TValueObject? instance)
         {
-            if (other is string value)
-                return EqualsCaseInsensitive(value);
+            if (TryParse(value, out instance))
+            {
+                return true;
+            }
 
-            if (other is StringValueObject<TValueObject> valueObject)
-                return EqualsCaseInsensitive(valueObject);
-
-            if (other is Constant constant)
-                return EqualsCaseInsensitive(constant);
+            if (HasPublicFactory)
+            {
+                instance = CreateUsingFactory(value);
+                return true;
+            }
 
             return false;
         }
 
-        public bool EqualsCaseInsensitive(string? other)
-            => other is not null && Value.Equals(other, StringComparison.OrdinalIgnoreCase);
-
-        public bool EqualsCaseInsensitive(StringValueObject<TValueObject>? other)
-            => other is not null && Value.Equals(other.Value, StringComparison.OrdinalIgnoreCase);
-
-        public bool EqualsCaseInsensitive(Constant? other)
-            => other is not null && Value.Equals(other.Value, StringComparison.OrdinalIgnoreCase);
+        protected StringValueObject(string value) : base(value)
+        {
+            SetEqualityComparer(StringComparer.OrdinalIgnoreCase);
+        }
     }
 }

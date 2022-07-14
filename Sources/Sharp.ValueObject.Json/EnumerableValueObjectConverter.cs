@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 namespace Sharp.ValueObject.Json
 {
     public class EnumerableValueObjectConverter<TValue, TValueObject, TCollection> : JsonConverter<TCollection>
-        where TValue : IEquatable<TValue>
+        where TValue : notnull
         where TValueObject : SingleValueObject<TValue, TValueObject>
         where TCollection : IEnumerable<TValueObject>
     {

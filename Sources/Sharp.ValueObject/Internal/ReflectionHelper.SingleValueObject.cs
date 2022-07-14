@@ -11,7 +11,7 @@ namespace Sharp.ValueObject.Internal.Reflection
     internal static partial class ReflectionHelper
     {
         public static IReadOnlyCollection<SingleValueObject<TValue, TValueObject>.Constant> ReflectConstants<TValue, TValueObject>()
-            where TValue : IEquatable<TValue>
+            where TValue : notnull
             where TValueObject : SingleValueObject<TValue, TValueObject>
         {
             var constants = typeof(TValueObject)
@@ -25,7 +25,7 @@ namespace Sharp.ValueObject.Internal.Reflection
         }
 
         public static Func<TValue, TValueObject> GenerateConstructorWithValueParameter<TValue, TValueObject>(out bool isPublic)
-            where TValue : IEquatable<TValue>
+            where TValue : notnull
             where TValueObject : SingleValueObject<TValue, TValueObject>
         {
             const BindingFlags constructorMask = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;

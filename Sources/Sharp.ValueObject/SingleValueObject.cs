@@ -13,17 +13,40 @@ namespace Sharp.ValueObject
         , IEquatable<SingleValueObject<TValue, TValueObject>>
         , IEquatable<SingleValueObject<TValue, TValueObject>.Constant>
         , ICloneable
-        where TValue : IEquatable<TValue>
+        where TValue : notnull
         where TValueObject : SingleValueObject<TValue, TValueObject>
     {
         private static readonly bool _valueObjectFactoryIsPublic;
         private static readonly Func<TValue, TValueObject> _valueObjectFactory;
         private static readonly IReadOnlyCollection<Constant> _declaredConstants;
+        private static IEqualityComparer<TValue> _valueEqualityComparer;
 
         static SingleValueObject()
         {
             _valueObjectFactory = ReflectionHelper.GenerateConstructorWithValueParameter<TValue, TValueObject>(out _valueObjectFactoryIsPublic);
             _declaredConstants = ReflectionHelper.ReflectConstants<TValue, TValueObject>();
+            _valueEqualityComparer = EqualityComparer<TValue>.Default;
+        }
+
+        protected static bool HasPublicFactory => _valueObjectFactoryIsPublic;
+
+        public static TValueObject Create(TValue value)
+        {
+            if (!TryCreate(value, out var valueObject))
+                throw new InvalidOperationException();
+
+            return valueObject;
+        }
+
+        public static bool TryCreate(TValue value, [NotNullWhen(true)] out TValueObject? valueObject)
+        {
+            if (HasPublicFactory)
+            {
+                valueObject = CreateUsingFactory(value);
+                return true;
+            }
+
+            return TryGetDeclaredValue(value, out valueObject);
         }
 
         public static IEnumerable<Constant> GetDeclaredConstants() => _declaredConstants;
@@ -32,21 +55,15 @@ namespace Sharp.ValueObject
             where TConstant : Constant => _declaredConstants.OfType<TConstant>();
 
         public static bool TryGetDeclaredConstant(TValue value, [NotNullWhen(true)] out Constant? constant)
-            => TryGetDeclaredConstant(value, EqualityComparer<TValue>.Default, out constant);
-
-        public static bool TryGetDeclaredConstant(TValue value, IEqualityComparer<TValue> comparer, [NotNullWhen(true)] out Constant? constant)
         {
-            constant = _declaredConstants.FirstOrDefault(c => comparer.Equals(c.Value, value));
+            constant = _declaredConstants.FirstOrDefault(c => _valueEqualityComparer.Equals(c.Value, value));
             return constant is not null;
         }
 
         public static bool TryGetDeclaredConstant<TConstant>(TValue value, [NotNullWhen(true)] out TConstant? constant)
-            where TConstant : Constant => TryGetDeclaredConstant(value, EqualityComparer<TValue>.Default, out constant);
-
-        public static bool TryGetDeclaredConstant<TConstant>(TValue value, IEqualityComparer<TValue> comparer, [NotNullWhen(true)] out TConstant? constant)
             where TConstant : Constant
         {
-            if (TryGetDeclaredConstant(value, comparer, out Constant? declaredConstant) && declaredConstant is TConstant typedConstant)
+            if (TryGetDeclaredConstant(value, out Constant? declaredConstant) && declaredConstant is TConstant typedConstant)
             {
                 constant = typedConstant;
                 return true;
@@ -57,11 +74,8 @@ namespace Sharp.ValueObject
         }
 
         public static bool TryGetDeclaredValue(TValue value, [NotNullWhen(true)] out TValueObject? valueObject)
-            => TryGetDeclaredValue(value, EqualityComparer<TValue>.Default, out valueObject);
-
-        public static bool TryGetDeclaredValue(TValue value, IEqualityComparer<TValue> comparer, [NotNullWhen(true)] out TValueObject? valueObject)
         {
-            if (TryGetDeclaredConstant(value, comparer, out Constant? constant))
+            if (TryGetDeclaredConstant(value, out Constant? constant))
             {
                 valueObject = constant;
                 return true;
@@ -71,31 +85,21 @@ namespace Sharp.ValueObject
             return false;
         }
 
-        // TODO: This is probably not a necessary method.
-        public static TValueObject Create(TValue value)
-            => Create(value, EqualityComparer<TValue>.Default);
-
-        // TODO: This is probably not a necessary method.
-        public static TValueObject Create(TValue value, IEqualityComparer<TValue> comparer)
-        {
-            if (TryGetDeclaredValue(value, comparer, out TValueObject? valueObject))
-            {
-                return valueObject;
-            }
-
-            if (_valueObjectFactoryIsPublic)
-            {
-                return _valueObjectFactory.Invoke(value);
-            }
-
-            throw new InvalidOperationException($@"The value ""{value}"" cannot be used to create instance of {typeof(TValueObject)}");
-        }
-
         public static bool operator ==(SingleValueObject<TValue, TValueObject>? left, SingleValueObject<TValue, TValueObject>? right)
             => left is null ? right is null : left.Equals(right);
 
         public static bool operator !=(SingleValueObject<TValue, TValueObject>? left, SingleValueObject<TValue, TValueObject>? right)
             => !(left == right);
+
+        protected static TValueObject CreateUsingFactory(TValue value)
+        {
+            return _valueObjectFactory.Invoke(value);
+        }
+
+        protected static void SetEqualityComparer(IEqualityComparer<TValue> equalityComparer)
+        {
+            _valueEqualityComparer = equalityComparer ?? throw new ArgumentNullException(nameof(equalityComparer));
+        }
 
         protected SingleValueObject(TValue value)
         {
@@ -119,13 +123,13 @@ namespace Sharp.ValueObject
         }
 
         public bool Equals(TValue? other)
-            => other is not null && Value.Equals(other);
+            => _valueEqualityComparer.Equals(Value, other);
 
         public bool Equals(SingleValueObject<TValue, TValueObject>? other)
-            => other is not null && Value.Equals(other.Value);
+            => other is not null && _valueEqualityComparer.Equals(Value, other.Value);
 
         public bool Equals(SingleValueObject<TValue, TValueObject>.Constant? other)
-            => other is not null && Value.Equals(other.Value);
+            => other is not null && _valueEqualityComparer.Equals(Value, other.Value);
 
         public override int GetHashCode() => Value.GetHashCode();
 
@@ -138,7 +142,7 @@ namespace Sharp.ValueObject
         public class Constant : IEquatable<SingleValueObject<TValue, TValueObject>>, IEquatable<Constant>
         {
             public static implicit operator TValueObject(Constant constant)
-                => _valueObjectFactory.Invoke(constant.Value);
+                => CreateUsingFactory(constant.Value);
 
             public static bool operator ==(Constant? left, Constant? right)
                 => left is null ? right is null : left.Equals(right);
@@ -147,7 +151,7 @@ namespace Sharp.ValueObject
                 => !(left == right);
 
             public static bool operator ==(Constant? left, SingleValueObject<TValue, TValueObject>? right)
-                => left is null ? right is null : left.Equals(right);
+                => left is null ? right is null : right is not null && _valueEqualityComparer.Equals(left.Value, right.Value);
 
             public static bool operator !=(Constant? left, SingleValueObject<TValue, TValueObject>? right)
                 => !(left == right);
@@ -177,10 +181,10 @@ namespace Sharp.ValueObject
             }
 
             public bool Equals(SingleValueObject<TValue, TValueObject>? other)
-                => other is not null && Value.Equals(other.Value);
+                => other is not null && _valueEqualityComparer.Equals(Value, other.Value);
 
             public bool Equals(SingleValueObject<TValue, TValueObject>.Constant? other)
-                => other is not null && Value.Equals(other.Value);
+                => other is not null && _valueEqualityComparer.Equals(Value, other.Value);
 
             public override int GetHashCode() => Value.GetHashCode();
 

@@ -28,20 +28,22 @@ namespace Sharp.ValueObject.Json.Internal
             static Func<JsonConverter> CreateSingleValueObjectFactory(Type typeToConvert)
             {
                 Type genericValueObjectType = ValueObject.GetGenericValueObjectType(typeToConvert);
-                Type innerValueType = ValueObject.GetSingleValueObjectInnerValueType(genericValueObjectType);
-
                 Type[] genericArguments = genericValueObjectType.GetGenericArguments();
-                Type converterType = typeof(ValueObjectConverter<,>).MakeGenericType(genericArguments);
 
-                Type converterConstructorParameter = typeof(IEqualityComparer<>).MakeGenericType(innerValueType);
-                ConstructorInfo? converterConstructor = converterType
-                    .GetConstructor(new[] { converterConstructorParameter });
+                Debug.Assert(genericArguments.Length == 2,
+                    $"Unexpected count of generic arguments in {genericValueObjectType}");
 
-                Debug.Assert(converterConstructor != null,
-                    $"The type {converterType} does not have constructor with {converterConstructorParameter} parameter");
+                Type converterType = genericArguments[0] == typeof(string)
+                    ? typeof(StringValueObjectConverter<>).MakeGenericType(genericArguments[1])
+                    : typeof(ValueObjectConverter<,>).MakeGenericType(genericArguments);
 
-                var factoryMethod = Expression.Lambda<Func<JsonConverter>>(
-                    Expression.New(converterConstructor, GetEqualityComparer(innerValueType)));
+                ConstructorInfo? converterConstructor = converterType.GetConstructor(Array.Empty<Type>());
+
+                Debug.Assert(converterConstructor is not null,
+                    $"The type {converterType} does not have parameterless constructor");
+
+                var factoryMethod = Expression
+                    .Lambda<Func<JsonConverter>>(Expression.New(converterConstructor));
 
                 return factoryMethod.Compile();
             }
@@ -60,7 +62,8 @@ namespace Sharp.ValueObject.Json.Internal
                 Debug.Assert(converterConstructor != null,
                     $"Type {converterType} does not have parameterless constructor");
 
-                var factoryMethod = Expression.Lambda<Func<JsonConverter>>(Expression.New(converterConstructor));
+                var factoryMethod = Expression
+                    .Lambda<Func<JsonConverter>>(Expression.New(converterConstructor));
 
                 return factoryMethod.Compile();
             }
@@ -79,18 +82,6 @@ namespace Sharp.ValueObject.Json.Internal
                     .FirstOrDefault(type => ValueObject.IsSingleValueObjectType(type));
 
                 return valueObjectType != null;
-            }
-
-            static Expression GetEqualityComparer(Type type)
-            {
-                BindingFlags propertyBindingMask = BindingFlags.Public | BindingFlags.Static;
-
-                // TODO: For strings, case-insensitive comparisons are always used
-                PropertyInfo equalityComparerProperty = (type == typeof(string))
-                    ? typeof(StringComparer).GetProperty(nameof(StringComparer.OrdinalIgnoreCase), propertyBindingMask)!
-                    : typeof(EqualityComparer<>).MakeGenericType(type).GetProperty(nameof(EqualityComparer<object>.Default), propertyBindingMask)!;
-
-                return Expression.Property(expression: null, equalityComparerProperty);
             }
         }
     }

@@ -27,27 +27,18 @@ namespace Sharp.ValueObject.Tests
         }
 
         [Fact]
-        public void TryParseCaseInsensitive_DefinedValue_ReturnTrueAndNotNullValue()
+        public void TryParse_DefinedValueToLower_ReturnTrueAndNotNullValue()
         {
             string[] keys = { Color.Green.Value.ToLower(), Color.Green.Value.ToUpper() };
 
             foreach (var key in keys)
             {
-                bool tryResult = Color.TryParseCaseInsensitive(key, out Color? color);
+                bool tryResult = Color.TryParse(key, out Color? color);
 
                 Assert.True(tryResult);
                 Assert.NotNull(color);
                 Assert.Equal(Color.Green, color);
             }
-        }
-
-        [Fact]
-        public void TryParseCaseInsensitive_NotDefinedValue_ReturnFalseAndNullValue()
-        {
-            bool tryResult = Color.TryParseCaseInsensitive("some string", out Color? color);
-
-            Assert.False(tryResult);
-            Assert.Null(color);
         }
     }
 }
