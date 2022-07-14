@@ -1,5 +1,4 @@
-﻿using Sharp.ValueObject.Internal;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Sharp.ValueObject

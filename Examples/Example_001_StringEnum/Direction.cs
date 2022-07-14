@@ -1,4 +1,4 @@
-﻿using Sharp.ValueObject.SingleValueObjects;
+﻿using Sharp.ValueObject;
 
 namespace Example_001_StringEnum
 {

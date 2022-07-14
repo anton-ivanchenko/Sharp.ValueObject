@@ -1,4 +1,4 @@
-﻿using Sharp.ValueObject.SingleValueObjects;
+﻿using Sharp.ValueObject;
 using Sharp.ValueObject.Visitors;
 using Sharp.ValueObject.Visitors.Attributes;
 using System.Diagnostics.CodeAnalysis;

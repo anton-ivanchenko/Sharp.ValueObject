@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Sharp.ValueObject.SingleValueObjects
+namespace Sharp.ValueObject
 {
     public abstract class StringValueObject<TValueObject> : SingleValueObject<string, TValueObject>
         where TValueObject : SingleValueObject<string, TValueObject>
