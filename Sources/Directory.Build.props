@@ -1,6 +1,6 @@
 <Project>
  <PropertyGroup>
-    <Version>0.2.0.0</Version>
+    <Version>0.3.0.1</Version>
     <Authors>Anton Ivanchenko</Authors>
 	<RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/anton-ivanchenko/Sharp.ValueObject</RepositoryUrl>
