@@ -9,7 +9,7 @@ namespace Sharp.ValueObject
         public static TValueObject Parse(string value)
         {
             if (!TryParse(value, out var valueObject))
-                throw new InvalidOperationException();
+                throw new InvalidOperationException($"The type {typeof(TValueObject)} cannot be parsed from {value} value");
 
             return valueObject;
         }
@@ -17,7 +17,7 @@ namespace Sharp.ValueObject
         public static TValueObject ParseOrCreate(string value)
         {
             if (!TryParseOrCreate(value, out var valueObject))
-                throw new InvalidOperationException();
+                throw new InvalidOperationException($"The type {typeof(TValueObject)} cannot be parsed from {value} value");
 
             return valueObject;
         }

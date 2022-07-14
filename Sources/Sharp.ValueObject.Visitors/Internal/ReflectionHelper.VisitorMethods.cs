@@ -59,7 +59,7 @@ namespace Sharp.ValueObject.Visitors
                 var targetConstant = targetType.GetProperty(targetMethodAttribute.ConstantName, BindingFlags.Public | BindingFlags.Static);
 
                 if (targetConstant is null)
-                    throw new InvalidOperationException();
+                    throw new InvalidOperationException($"Wrong target constant {targetMethodAttribute.ConstantName} in {targetType}");
 
                 var condition = Expression.IfThen(
                     Expression.Equal(valueObjectVariable, Expression.Property(expression: null, targetConstant)),

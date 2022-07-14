@@ -33,7 +33,7 @@ namespace Sharp.ValueObject
         public static TValueObject Create(TValue value)
         {
             if (!TryCreate(value, out var valueObject))
-                throw new InvalidOperationException();
+                throw new InvalidOperationException($"The type {typeof(TValueObject)} cannot be created with {value} value");
 
             return valueObject;
         }
