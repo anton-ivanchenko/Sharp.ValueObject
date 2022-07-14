@@ -40,5 +40,43 @@ namespace Sharp.ValueObject.Tests
                 Assert.Equal(Color.Green, color);
             }
         }
+
+        [Fact]
+        public void Equals_EqualValuesCaseInsensitive_ReturnTrue()
+        {
+            Color color = Color.Green;
+
+            Assert.True(color.Equals(color.Value.ToLower()));
+            Assert.True(color.Equals(color.Value.ToUpper()));
+        }
+
+        [Fact]
+        public void Equals_NotEqualValuesCaseInsensitive_ReturnFalse()
+        {
+            Color color = Color.Green;
+
+            Assert.False(color.Equals(Color.Red.Value.ToLower()));
+            Assert.False(color.Equals(Color.Red.Value.ToUpper()));
+        }
+
+        [Fact]
+        public void OperatorEquals_EqualValuesCaseInsensitive_ReturnTrue()
+        {
+            Color lowercaseColor = new(Color.Green.Value.ToLower());
+            Color uppercaseColor = new(Color.Green.Value.ToUpper());
+
+            Assert.True(lowercaseColor == Color.Green);
+            Assert.True(uppercaseColor == Color.Green);
+        }
+
+        [Fact]
+        public void OperatorEquals_NotEqualValuesCaseInsensitive_ReturnFalse()
+        {
+            Color lowercaseColor = new(Color.Green.Value.ToLower());
+            Color uppercaseColor = new(Color.Green.Value.ToUpper());
+
+            Assert.False(lowercaseColor == Color.Red);
+            Assert.False(uppercaseColor == Color.Red);
+        }
     }
 }
