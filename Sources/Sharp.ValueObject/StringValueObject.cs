@@ -41,9 +41,11 @@ namespace Sharp.ValueObject
             return false;
         }
 
-        protected StringValueObject(string value) : base(value)
+        static StringValueObject()
         {
             SetEqualityComparer(StringComparer.OrdinalIgnoreCase);
         }
+
+        protected StringValueObject(string value) : base(value) { }
     }
 }
